@@ -115,7 +115,6 @@ await test('animate(): stop() hands back live state for a drag to take over', as
   assert.equal(await a.finished, false);
 });
 
-console.log(`\n${passed} passed`);
 
 // ── helpers added after studying real gesture and display behaviour ──
 import { projectedProgress, adaptiveThreshold, displayFilter } from '../skills/second-nature/assets/physics.js';
