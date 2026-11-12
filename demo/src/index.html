@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <title>Second Nature — touch everything</title>
+    <meta name="description" content="An interactive tour of the Second Nature design skill: springs, momentum, continuous corners and feedback." />
+    <style>
+      /* @css skills/second-nature/assets/tokens.css */
+      /* @css skills/second-nature/assets/base.css */
+
+      /* ── Page ─────────────────────────────────────────────────────────── */
+      main {
+        max-inline-size: 760px;
+        margin-inline: auto;
+        padding: 0 max(var(--sn-gutter), env(safe-area-inset-left)) var(--sn-space-32);
+      }
+      header.hero {
+        min-block-size: 78svh;
+        display: grid;
+        align-content: center;
+        gap: var(--sn-space-6);
+        padding-block: var(--sn-space-24);
+      }
+      .hero h1 {
+        font-size: var(--sn-text-hero);
+        line-height: var(--sn-leading-tight);
+        letter-spacing: var(--sn-tracking-display);
+        font-weight: 650;
+      }
+      .hero p {
+        font-size: var(--sn-text-title-2);
+        line-height: 1.35;
+        color: var(--sn-label-2);
+        max-inline-size: 26ch;
+      }
+      section {
+        padding-block: var(--sn-space-16);
+      }
+      .eyebrow {
+        font-size: var(--sn-text-footnote);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--sn-label-3);
+        margin-block-end: var(--sn-space-3);
+      }
+      section h2 {
+        font-size: var(--sn-text-large-title);
+        letter-spacing: var(--sn-tracking-display);
+        line-height: var(--sn-leading-tight);
+      }
+      section > p {
+        margin-block: var(--sn-space-3) var(--sn-space-8);
+        color: var(--sn-label-2);
+      }
+      .demo {
+        --r: var(--sn-radius-xl);
+        position: relative;
+        background: var(--sn-bg-2);
+        border-radius: calc(var(--r) * var(--sn-corner-scale));
+        corner-shape: var(--sn-corner-shape);
+        padding: var(--sn-space-6);
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--sn-space-4);
+        margin-block-start: var(--sn-space-5);
+      }
+      .readout {
+        font: 500 var(--sn-text-footnote) / 1.4 var(--sn-font-mono);
+        font-variant-numeric: tabular-nums;
+        color: var(--sn-label-2);
+      }
+
+      /* ── 1 · Throw ────────────────────────────────────────────────────── */
+      .stage {
+        position: relative;
+        block-size: clamp(240px, 46vw, 340px);
+        border-radius: var(--sn-radius-lg);
+        background:
+          radial-gradient(circle at 1px 1px, var(--sn-label-4) 1px, transparent 0) 0 0 / 20px 20px,
+          var(--sn-bg);
+        overflow: hidden;
+        touch-action: none;
+      }
+      .puck {
+        --r: 20px;
+        position: absolute;
+        inset: 0 auto auto 0;
+        inline-size: 76px;
+        block-size: 76px;
+        background: linear-gradient(160deg, color-mix(in oklch, var(--sn-accent) 82%, white), var(--sn-accent));
+        box-shadow: var(--sn-shadow-2), inset 0 1px 0 rgb(255 255 255 / 0.35);
+        cursor: grab;
+        touch-action: none;
+        transition:
+          scale var(--sn-spring-snappy-duration) var(--sn-spring-snappy),
+          box-shadow var(--sn-dur-base) var(--sn-ease-out);
+      }
+      .puck.held {
+        cursor: grabbing;
+        scale: 1.07; /* picked up: closer to you, bigger shadow */
+        box-shadow: var(--sn-shadow-4), inset 0 1px 0 rgb(255 255 255 / 0.35);
+      }
+
+      /* ── 2 · Sheet ────────────────────────────────────────────────────── */
+      .device-wrap {
+        display: grid;
+        place-items: center;
+      }
+      .device {
+        position: relative;
+        inline-size: min(100%, 290px);
+        block-size: 520px;
+        border-radius: 44px;
+        background: var(--sn-bg);
+        box-shadow: 0 0 0 8px var(--sn-fill-1), var(--sn-shadow-3);
+        overflow: hidden;
+      }
+      .device-content {
+        padding: 56px 20px 0;
+        display: grid;
+        gap: 12px;
+      }
+      .device-content i {
+        display: block;
+        block-size: 12px;
+        border-radius: 6px;
+        background: var(--sn-fill-1);
+      }
+      .device-content i:first-child {
+        block-size: 26px;
+        inline-size: 55%;
+        margin-block-end: 8px;
+        background: var(--sn-fill-1);
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .sheet {
+        position: absolute;
+        inset: 0;
+        border-radius: 32px 32px 0 0;
+        padding: 0 20px;
+        cursor: grab;
+        will-change: transform;
+      }
+      .grabber {
+        inline-size: 36px;
+        block-size: 5px;
+        margin: 8px auto 14px;
+        border-radius: 3px;
+        background: var(--sn-label-4);
+      }
+      .sheet h3 {
+        font-size: var(--sn-text-title-3);
+      }
+      .sheet small {
+        color: var(--sn-label-2);
+        font-size: var(--sn-text-subhead);
+      }
+      .sheet .sn-list {
+        margin-block-start: 22px;
+        background: var(--sn-fill-2);
+        font-size: var(--sn-text-subhead);
+      }
+
+      /* ── 3 · Slide to confirm ─────────────────────────────────────────── */
+      .slide {
+        position: relative;
+        block-size: 64px;
+        padding: 4px;
+        border-radius: 32px;
+        background: var(--sn-fill-1);
+        overflow: hidden;
+      }
+      .slide-label {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding-inline-start: 40px;
+        font-weight: 500;
+        color: var(--sn-label-2);
+        pointer-events: none;
+      }
+      .slide-fill {
+        position: absolute;
+        inset: 0;
+        background: var(--sn-success);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .knob {
+        position: relative;
+        inline-size: 56px;
+        block-size: 56px;
+        border-radius: 28px; /* concentric: 32 − 4 */
+        display: grid;
+        place-items: center;
+        background: var(--sn-bg-3);
+        color: var(--sn-label);
+        box-shadow: var(--sn-shadow-2);
+        cursor: grab;
+      }
+      .knob svg {
+        inline-size: 22px;
+        block-size: 22px;
+        transition: opacity var(--sn-dur-fast) var(--sn-ease-out);
+      }
+      .knob .check {
+        position: absolute;
+        opacity: 0;
+        color: var(--sn-success);
+      }
+      .slide.done .arrow {
+        opacity: 0;
+      }
+      .slide.done .check {
+        opacity: 1;
+      }
+      .ticks {
+        position: relative;
+        block-size: 18px;
+        margin: 6px 32px 0;
+        font: 500 11px/1 var(--sn-font-mono);
+        color: var(--sn-label-3);
+      }
+      .ticks span {
+        position: absolute;
+        inset-block-start: 6px;
+        translate: -50% 0;
+      }
+      .ticks span::before {
+        content: '';
+        position: absolute;
+        inset: -6px auto auto 50%;
+        inline-size: 1px;
+        block-size: 4px;
+        background: currentColor;
+      }
+
+      /* ── 4 · Corners ──────────────────────────────────────────────────── */
+      .corners {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--sn-space-6);
+        align-items: center;
+      }
+      .corners figure {
+        margin: 0;
+        display: grid;
+        gap: var(--sn-space-3);
+        justify-items: center;
+      }
+      .corners figcaption {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+        text-align: center;
+      }
+      .corners svg {
+        inline-size: 100%;
+        max-inline-size: 260px;
+      }
+      #zoom {
+        max-inline-size: 180px;
+        aspect-ratio: 1;
+        border-radius: var(--sn-radius-md);
+        background: var(--sn-bg);
+        overflow: hidden;
+      }
+      .legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-inline: 6px;
+      }
+      .legend::before {
+        content: '';
+        inline-size: 14px;
+        block-size: 2px;
+        border-radius: 1px;
+        background: var(--c);
+      }
+      input[type='range'] {
+        flex: 1;
+        min-inline-size: 140px;
+        accent-color: var(--sn-accent);
+        block-size: var(--sn-hit);
+        margin: 0;
+      }
+
+      /* ── 5 · Concentric ───────────────────────────────────────────────── */
+      .nest {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--sn-space-6);
+      }
+      .nest figure {
+        margin: 0;
+        display: grid;
+        gap: var(--sn-space-3);
+      }
+      .nest .outer {
+        --R: 40px;
+        --p: 12px;
+        padding: var(--p);
+        border-radius: var(--R);
+        background: var(--sn-bg-3);
+        box-shadow: var(--sn-edge), var(--sn-shadow-1);
+      }
+      .nest .inner {
+        block-size: 96px;
+        background: var(--sn-accent-soft);
+        box-shadow: inset 0 0 0 1.5px var(--sn-accent);
+      }
+      .nest .wrong .inner {
+        border-radius: var(--R);
+      }
+      .nest .right .inner {
+        border-radius: max(var(--R) - var(--p), 4px);
+      }
+      .nest figcaption {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+      }
+
+      /* ── 6 · Controls ─────────────────────────────────────────────────── */
+      .controls {
+        display: grid;
+        gap: var(--sn-space-6);
+      }
+      .controls .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sn-space-3);
+      }
+      .controls .sn-list > * {
+        justify-content: space-between;
+      }
+      .controls .sn-list small {
+        display: block;
+        color: var(--sn-label-2);
+        font-size: var(--sn-text-footnote);
+        line-height: 1.3;
+      }
+
+      /* ── 7 · Jiggle ───────────────────────────────────────────────────── */
+      .icons {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: clamp(10px, 3vw, 22px);
+        padding: var(--sn-space-2);
+      }
+      .icons i {
+        --r: 15px;
+        aspect-ratio: 1;
+        background: var(--c);
+        border-radius: calc(var(--r) * var(--sn-corner-scale));
+        corner-shape: var(--sn-corner-shape);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+      }
+      .icons i.wide {
+        grid-column: span 2;
+        grid-row: span 2;
+        aspect-ratio: auto;
+        --r: 26px;
+      }
+      .icons.sync i {
+        animation: in-step 128ms ease-in-out infinite alternate;
+      }
+      @keyframes in-step {
+        from {
+          rotate: -1.72deg;
+        }
+        to {
+          rotate: 1.72deg;
+        }
+      }
+
+      /* ── 8 · Calm numbers ─────────────────────────────────────────────── */
+      .calm {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--sn-space-6);
+      }
+      .calm div {
+        display: grid;
+        gap: var(--sn-space-2);
+      }
+      .calm b {
+        font: 600 clamp(2.2rem, 9vw, 3.6rem) / 1 var(--sn-font-display);
+        letter-spacing: var(--sn-tracking-display);
+        font-variant-numeric: tabular-nums;
+      }
+      .calm .raw b {
+        color: var(--sn-label-3);
+      }
+      .calm span {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+      }
+      .bar {
+        block-size: 6px;
+        border-radius: 3px;
+        background: var(--sn-fill-1);
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        block-size: 100%;
+        inline-size: 100%;
+        border-radius: 3px;
+        background: var(--sn-label);
+        transform-origin: left;
+      }
+      .raw .bar i {
+        background: var(--sn-label-3);
+      }
+
+      footer {
+        padding-block: var(--sn-space-16) 0;
+        color: var(--sn-label-3);
+        font-size: var(--sn-text-footnote);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <h1>Second Nature</h1>
+        <p>Interfaces that behave like objects. Touch everything on this page.</p>
+      </header>
+
+      <section aria-labelledby="t1">
+        <div class="eyebrow">Physics</div>
+        <h2 id="t1">Throw it.</h2>
+        <p>
+          While you hold it, it is your finger. When you let go, a spring takes over at exactly the speed you were moving and lands where
+          the throw was heading. Catch it mid-flight: nothing waits for an animation to finish.
+        </p>
+        <div class="demo">
+          <div class="stage" id="stage"><div class="puck sn-squircle" id="puck" role="img" aria-label="Draggable tile"></div></div>
+          <div class="row">
+            <div class="sn-segmented" id="springPick" style="--count: 3; min-inline-size: 240px">
+              <label><input type="radio" name="spring" value="0" />Smooth</label>
+              <label><input type="radio" name="spring" value="0.15" checked />Snappy</label>
+              <label><input type="radio" name="spring" value="0.3" />Bouncy</label>
+            </div>
+            <div class="readout" id="springOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t2">
+        <div class="eyebrow">Edges</div>
+        <h2 id="t2">Pull past the end.</h2>
+        <p>
+          Nothing in the world stops dead. Past its limit the sheet keeps following, less and less, and never more than its own height.
+          Flick it and it settles on the stop nearest to where momentum would have carried it.
+        </p>
+        <div class="demo device-wrap">
+          <div class="device">
+            <div class="device-content"><i></i><i></i><i style="inline-size: 82%"></i><i style="inline-size: 64%"></i><i></i><i style="inline-size: 74%"></i></div>
+            <div class="scrim" id="scrim"></div>
+            <div class="sheet sn-material" id="sheet">
+              <div class="grabber"></div>
+              <h3>Up Next</h3>
+              <small>Drag, flick, or catch it on the way.</small>
+              <ul class="sn-list">
+                <li>Morning</li>
+                <li>Quiet hours</li>
+                <li>Evening</li>
+                <li>Night</li>
+              </ul>
+            </div>
+          </div>
+          <div class="readout" id="sheetOut" style="margin-block-start: 20px">following 1:1</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t3">
+        <div class="eyebrow">Intent</div>
+        <h2 id="t3">Slide to confirm.</h2>
+        <p>
+          There is no resistance here: the weight you feel is the spring back. It commits when where you were <em>going</em> passes 85%,
+          so a slow drag has to reach the line and a confident flick gets there on momentum.
+        </p>
+        <div class="demo">
+          <div class="slide" id="slide">
+            <div class="slide-fill" id="slideFill"></div>
+            <div class="slide-label" id="slideLabel">slide to confirm</div>
+            <div class="knob" id="knob" role="slider" aria-label="Slide to confirm" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+            </div>
+          </div>
+          <div class="ticks"><span style="inset-inline-start: 85%">85%</span></div>
+          <div class="readout" id="slideOut" style="margin-block-start: 14px">projected 0%</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t4">
+        <div class="eyebrow">Geometry</div>
+        <h2 id="t4">Corners that flow.</h2>
+        <p>
+          A standard rounded corner is a straight line that abruptly becomes a circle. A continuous corner eases into the curve, the way
+          a machined edge does. You notice the first one. You never notice the second.
+        </p>
+        <div class="demo">
+          <div class="corners">
+            <figure>
+              <svg id="shapes" viewBox="0 0 260 120" aria-hidden="true"></svg>
+              <figcaption>Circular arc · Continuous</figcaption>
+            </figure>
+            <figure>
+              <svg id="zoom" viewBox="0 0 120 120" aria-hidden="true"></svg>
+              <figcaption>
+                <span class="legend" style="--c: var(--sn-label)">arc</span><span class="legend" style="--c: var(--sn-accent)">continuous</span>
+              </figcaption>
+            </figure>
+          </div>
+          <div class="row">
+            <input type="range" id="radius" min="8" max="56" value="32" aria-label="Corner radius" />
+            <div class="readout" id="radiusOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t5">
+        <div class="eyebrow">Geometry</div>
+        <h2 id="t5">Inner = outer − gap.</h2>
+        <p>Give a child the same radius as its parent and the gap between them pinches at every corner. Subtract the padding and the two curves share a centre.</p>
+        <div class="demo">
+          <div class="nest" id="nest">
+            <figure class="wrong">
+              <div class="outer"><div class="inner"></div></div>
+              <figcaption id="wrongOut"></figcaption>
+            </figure>
+            <figure class="right">
+              <div class="outer"><div class="inner"></div></div>
+              <figcaption id="rightOut"></figcaption>
+            </figure>
+          </div>
+          <div class="row">
+            <input type="range" id="gap" min="4" max="32" value="12" aria-label="Padding" />
+            <div class="readout" id="gapOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t6">
+        <div class="eyebrow">Feedback</div>
+        <h2 id="t6">Controls that answer.</h2>
+        <p>Every press is acknowledged on the way down, before you lift. Selections are objects that slide, not highlights that teleport.</p>
+        <div class="demo controls">
+          <div class="buttons">
+            <button class="sn-button" data-variant="primary" data-fb="medium">Continue</button>
+            <button class="sn-button" data-variant="tinted" data-fb="light">Not now</button>
+            <button class="sn-button" data-fb="light">Details</button>
+          </div>
+          <div class="sn-segmented" style="--count: 3" data-fb-change="selection">
+            <label><input type="radio" name="range" checked />Day</label>
+            <label><input type="radio" name="range" />Week</label>
+            <label><input type="radio" name="range" />Month</label>
+          </div>
+          <ul class="sn-list">
+            <li>
+              <label for="sound">Sound<small>Off until you ask for it.</small></label>
+              <input class="sn-switch" type="checkbox" role="switch" id="sound" />
+            </li>
+            <li>
+              <label for="haptics">Haptics<small>Where the device has them.</small></label>
+              <input class="sn-switch" type="checkbox" role="switch" id="haptics" checked />
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="t7">
+        <div class="eyebrow">Details</div>
+        <h2 id="t7">Alive, not looping.</h2>
+        <p>
+          One animation on every tile moves like a machine. Three slightly different clocks per tile, each started at a random moment,
+          take about twenty minutes to repeat. Bigger tiles tilt less, so their edges travel the same distance.
+        </p>
+        <div class="demo">
+          <div class="icons" id="icons"></div>
+          <div class="row">
+            <div class="sn-segmented" id="jigglePick" style="--count: 3; min-inline-size: 260px">
+              <label><input type="radio" name="jig" value="still" checked />Still</label>
+              <label><input type="radio" name="jig" value="organic" />Organic</label>
+              <label><input type="radio" name="jig" value="sync" />In step</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t8">
+        <div class="eyebrow">Trust</div>
+        <h2 id="t8">Calm numbers.</h2>
+        <p>Measurements jitter. A readout that jitters with them looks broken. Show a filtered value that moves in small, orderly steps and never backtracks.</p>
+        <div class="demo calm">
+          <div class="raw">
+            <span>Measured</span>
+            <b id="rawOut">100.0%</b>
+            <div class="bar"><i id="rawBar"></i></div>
+          </div>
+          <div>
+            <span>Shown</span>
+            <b id="shownOut">100%</b>
+            <div class="bar"><i id="shownBar"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <footer>Built with the Second Nature skill: tokens.css, base.css, physics.js, squircle.js and feedback.js, with nothing else.</footer>
+    </main>
+
+    <script type="module">
+      // @module Physics skills/second-nature/assets/physics.js
+      // @module Squircle skills/second-nature/assets/squircle.js
+      // @module Feedback skills/second-nature/assets/feedback.js
+
+      const { animate, draggable, springFromBounce, rubberbandClamp, project, nearest, VelocityTracker, projectedProgress, displayFilter, jiggle, SPRINGS } = Physics;
+      const { continuousCornerPath, concentricRadius } = Squircle;
+      const fb = Feedback.createFeedback({ haptics: true, sound: false });
+      const $ = (s, root = document) => root.querySelector(s);
+      const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+
+      /* ── 1 · Throw: 2D drag = two independent 1D springs ────────────────── */
+      {
+        const stage = $('#stage');
+        const puck = $('#puck');
+        const PAD = 16;
+        const pos = { x: 0, y: 0 };
+        const anim = { x: null, y: null };
+        const track = { x: new VelocityTracker(), y: new VelocityTracker() };
+        let spring = springFromBounce(0.5, 0.15);
+        let grab = null;
+
+        const limits = () => ({ x: stage.clientWidth - puck.offsetWidth - PAD * 2, y: stage.clientHeight - puck.offsetHeight - PAD * 2 });
+        const place = () => (puck.style.transform = `translate3d(${pos.x + PAD}px, ${pos.y + PAD}px, 0)`);
+        const settle = (axis, to, velocity) => {
+          anim[axis]?.stop();
+          anim[axis] = animate({ from: pos[axis], to, velocity, spring, onUpdate: (v) => ((pos[axis] = v), place()) });
+        };
+        place();
+
+        puck.addEventListener('pointerdown', (e) => {
+          if (grab) return; // a second finger doesn't get to steal it
+          try {
+            puck.setPointerCapture(e.pointerId); // keep tracking when the pointer leaves the tile
+          } catch {}
+          for (const a of ['x', 'y']) if (anim[a] && !anim[a].done) pos[a] = anim[a].stop().value; // catch it mid-flight
+          grab = { id: e.pointerId, px: e.clientX, py: e.clientY, x: pos.x, y: pos.y };
+          track.x.reset();
+          track.y.reset();
+          puck.classList.add('held');
+          fb.play('light');
+        });
+        puck.addEventListener('pointermove', (e) => {
+          if (grab?.id !== e.pointerId) return;
+          const lim = limits();
+          pos.x = rubberbandClamp(grab.x + e.clientX - grab.px, 0, lim.x, stage.clientWidth);
+          pos.y = rubberbandClamp(grab.y + e.clientY - grab.py, 0, lim.y, stage.clientHeight);
+          track.x.add(e.clientX, e.timeStamp);
+          track.y.add(e.clientY, e.timeStamp);
+          place();
+        });
+        const release = (e) => {
+          if (grab?.id !== e.pointerId) return;
+          grab = null;
+          puck.classList.remove('held');
+          const lim = limits();
+          const vx = track.x.velocity(e.timeStamp);
+          const vy = track.y.velocity(e.timeStamp);
+          // Land where the throw was going, not where the finger happened to lift.
+          settle('x', nearest([0, lim.x], pos.x + project(vx)), vx);
+          settle('y', nearest([0, lim.y], pos.y + project(vy)), vy);
+        };
+        puck.addEventListener('pointerup', release);
+        puck.addEventListener('pointercancel', release);
+
+        const show = () => {
+          const s = spring;
+          $('#springOut').textContent = `duration ${s.duration}s · bounce ${s.bounce} · stiffness ${s.stiffness.toFixed(0)} · damping ${s.damping.toFixed(1)}`;
+        };
+        $('#springPick').addEventListener('change', (e) => {
+          spring = springFromBounce(0.5, Number(e.target.value));
+          show();
+          fb.play('selection');
+          const lim = limits();
+          settle('x', pos.x > lim.x / 2 ? 0 : lim.x, 0); // show the new feel straight away
+        });
+        show();
+        new ResizeObserver(() => {
+          if (grab) return;
+          const lim = limits();
+          pos.x = nearest([0, lim.x], pos.x);
+          pos.y = nearest([0, lim.y], pos.y);
+          place();
+        }).observe(stage);
+      }
+
+      /* ── 2 · Sheet: detents, rubber band, linked scrim ──────────────────── */
+      {
+        const sheet = $('#sheet');
+        const scrim = $('#scrim');
+        const out = $('#sheetOut');
+        const FULL = 56;
+        const HALF = 250;
+        const PEEK = 432;
+        let last = PEEK;
+        const d = draggable(sheet, {
+          axis: 'y',
+          bounds: [FULL, PEEK],
+          snap: [FULL, HALF, PEEK],
+          initial: PEEK,
+          onUpdate(v, { dragging }) {
+            // One source of truth: the scrim is exactly as dark as the sheet is open.
+            scrim.style.opacity = Math.max(0, Math.min(1, (PEEK - v) / (PEEK - FULL))) * 0.4;
+            const beyond = v < FULL ? FULL - v : v > PEEK ? v - PEEK : 0;
+            out.textContent = beyond > 0.5 ? `resisting · ${beyond.toFixed(0)}pt past the edge` : dragging ? 'following 1:1' : 'at rest';
+          },
+          onSettle(t) {
+            if (t !== last) fb.play('soft');
+            last = t;
+          },
+        });
+        // A tap on the grabber steps through the stops. No velocity, so no bounce.
+        $('.grabber', sheet).addEventListener('click', () => {
+          const next = d.value > HALF + 1 ? HALF : d.value > FULL + 1 ? FULL : PEEK;
+          d.animateTo(next, { spring: SPRINGS.smooth });
+        });
+      }
+
+      /* ── 3 · Slide to confirm: commit on the projection ─────────────────── */
+      {
+        const slide = $('#slide');
+        const knob = $('#knob');
+        const label = $('#slideLabel');
+        const fill = $('#slideFill');
+        const out = $('#slideOut');
+        const THRESHOLD = 0.85;
+        let committed = false;
+        const span = () => slide.clientWidth - knob.offsetWidth - 8;
+        const d = draggable(knob, {
+          axis: 'x',
+          bounds: () => [0, span()],
+          slop: 2,
+          onUpdate(v, { velocity, dragging }) {
+            const p = Math.max(0, v / span());
+            label.style.opacity = 1 - Math.min(1, p * 1.8);
+            fill.style.opacity = committed ? 0.9 : 0;
+            knob.setAttribute('aria-valuenow', Math.round(p * 100));
+            if (dragging) out.textContent = `at ${Math.round(p * 100)}% · projected ${Math.round(projectedProgress(v, velocity, span()) * 100)}%`;
+          },
+          onRelease({ value, velocity }) {
+            const projected = projectedProgress(value, velocity, span());
+            const commit = projected >= THRESHOLD;
+            out.textContent = `projected ${Math.round(projected * 100)}% → ${commit ? 'commit' : 'spring back'}`;
+            if (!commit) return 0;
+            committed = true;
+            slide.classList.add('done');
+            fb.play('success');
+            setTimeout(() => {
+              committed = false;
+              slide.classList.remove('done');
+              d.animateTo(0, { spring: SPRINGS.smooth });
+            }, 1500);
+            return span();
+          },
+        });
+        // The same control from the keyboard: there is no gesture to project, so just act.
+        knob.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowRight') return;
+          e.preventDefault();
+          if (committed) return;
+          committed = true;
+          slide.classList.add('done');
+          fb.play('success');
+          d.animateTo(span(), { spring: SPRINGS.smooth });
+          setTimeout(() => {
+            committed = false;
+            slide.classList.remove('done');
+            d.animateTo(0, { spring: SPRINGS.smooth });
+          }, 1500);
+        });
+      }
+
+      /* ── 4 · Corners ────────────────────────────────────────────────────── */
+      {
+        const shapes = $('#shapes');
+        const zoom = $('#zoom');
+        const input = $('#radius');
+        const SIZE = 112;
+        const draw = () => {
+          const r = Number(input.value);
+          const arc = continuousCornerPath(SIZE, SIZE, r, 0);
+          const smooth = continuousCornerPath(SIZE, SIZE, r, 0.6);
+          shapes.innerHTML = `
+            <path d="${arc}" transform="translate(4 4)" fill="var(--sn-label-4)"/>
+            <path d="${smooth}" transform="translate(144 4)" fill="var(--sn-accent)"/>`;
+          // Magnify the top-right corner so the difference is visible.
+          const view = Math.min(SIZE, r * 1.8);
+          const m = view * 0.08; // a little air around the corner
+          zoom.setAttribute('viewBox', `${SIZE - view} ${-m} ${view + m} ${view + m}`);
+          const w = (view / 120) * 1.15;
+          zoom.innerHTML = `
+            <path d="${smooth}" fill="none" stroke="var(--sn-accent)" stroke-width="${w}"/>
+            <path d="${arc}" fill="none" stroke="var(--sn-label)" stroke-width="${w}" stroke-dasharray="${w * 2.5} ${w * 2.5}"/>`;
+          $('#radiusOut').textContent = `radius ${r} · curve starts ${(r * 1.6).toFixed(0)}px from the corner, not ${r}`;
+        };
+        input.addEventListener('input', draw);
+        draw();
+      }
+
+      /* ── 5 · Concentric ─────────────────────────────────────────────────── */
+      {
+        const input = $('#gap');
+        const R = 40;
+        const draw = () => {
+          const p = Number(input.value);
+          for (const el of $$('#nest .outer')) el.style.setProperty('--p', `${p}px`);
+          $('#wrongOut').textContent = `Same radius: ${R} inside ${R}`;
+          $('#rightOut').textContent = `Concentric: ${R} − ${p} = ${concentricRadius(R, p, 4)}`;
+          $('#gapOut').textContent = `padding ${p}`;
+        };
+        input.addEventListener('input', draw);
+        draw();
+      }
+
+      /* ── 6 · Feedback wiring: on the way down, on the causal event ───────── */
+      {
+        for (const el of $$('[data-fb]')) el.addEventListener('pointerdown', () => fb.play(el.dataset.fb));
+        for (const el of $$('[data-fb-change]')) el.addEventListener('change', () => fb.play(el.dataset.fbChange));
+        $('#sound').addEventListener('change', (e) => {
+          fb.configure({ sound: e.target.checked });
+          fb.play('selection');
+        });
+        $('#haptics').addEventListener('change', (e) => {
+          fb.configure({ haptics: e.target.checked });
+          fb.play('selection');
+        });
+      }
+
+      /* ── 7 · Jiggle ─────────────────────────────────────────────────────── */
+      {
+        const grid = $('#icons');
+        const hues = [262, 95, 27, 200, 165, 320, 55, 232];
+        grid.innerHTML =
+          `<i class="wide" data-size="2" style="--c: oklch(0.3 0.02 262)"></i>` +
+          hues.map((h, i) => `<i data-size="1" style="--c: oklch(${0.62 + (i % 3) * 0.06} 0.17 ${h})"></i>`).join('');
+        let stop = [];
+        $('#jigglePick').addEventListener('change', (e) => {
+          stop.forEach((fn) => fn());
+          stop = [];
+          grid.classList.toggle('sync', e.target.value === 'sync');
+          if (e.target.value === 'organic') stop = $$('i', grid).map((el) => jiggle(el, { size: Number(el.dataset.size), amount: 1.25 }));
+          fb.play('selection');
+        });
+      }
+
+      /* ── 8 · Calm numbers ───────────────────────────────────────────────── */
+      {
+        const filter = () => displayFilter({ maxChange: 1, intervalMs: 700, monotonic: 'down' });
+        let shown = filter();
+        let level = 100;
+        setInterval(() => {
+          level -= 0.12;
+          if (level < 6) {
+            level = 100;
+            shown = filter();
+          }
+          const raw = Math.max(0, Math.min(100, level + (Math.random() - 0.5) * 5));
+          const calm = shown(raw);
+          $('#rawOut').textContent = `${raw.toFixed(1)}%`;
+          $('#rawBar').style.transform = `scaleX(${raw / 100})`;
+          $('#shownOut').textContent = `${Math.round(calm)}%`;
+          $('#shownBar').style.transform = `scaleX(${calm / 100})`;
+        }, 140);
+      }
+    </script>
+  </body>
+</html>

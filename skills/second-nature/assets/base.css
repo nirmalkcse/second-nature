@@ -1,0 +1,427 @@
+/**
+ * second-nature · base.css
+ *
+ * The floor, plus a handful of primitives that show the rules at work.
+ * Requires tokens.css. Everything is in @layer so a project's own styles
+ * always win without a specificity fight.
+ *
+ * This is a reference implementation, not a component library: read it for
+ * the decisions (each has its reason beside it), then build with the
+ * project's own stack.
+ */
+
+@layer sn.base, sn.components;
+
+@layer sn.base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%; /* no surprise font inflation in landscape */
+    -webkit-tap-highlight-color: transparent; /* we provide our own press state */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scrollbar-gutter: stable; /* content doesn't jump when a scrollbar appears */
+  }
+
+  body {
+    margin: 0;
+    background: var(--sn-bg);
+    color: var(--sn-label);
+    font: 400 var(--sn-text-body) / var(--sn-leading-body) var(--sn-font);
+    letter-spacing: var(--sn-tracking-body);
+    font-optical-sizing: auto;
+    font-kerning: normal;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--sn-font-display);
+    font-weight: 600;
+    line-height: var(--sn-leading-snug);
+    letter-spacing: var(--sn-tracking-title);
+    text-wrap: balance; /* no orphaned last word in a headline */
+  }
+
+  p {
+    margin: 0;
+    max-inline-size: var(--sn-measure);
+    text-wrap: pretty;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  /* Controls are things you press, not text you select or zoom. */
+  button,
+  [role='button'],
+  summary,
+  label {
+    touch-action: manipulation; /* no 300ms double-tap wait */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  /* Below 16px, iOS zooms the page on focus and never zooms back. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  /* Focus is feedback for the keyboard. Show it only when the keyboard is in
+     use, and make it unmistakable when it is. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    box-shadow: var(--sn-focus-ring);
+    outline: 2px solid transparent; /* stays visible in forced-colors mode */
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--sn-accent) 28%, transparent);
+  }
+
+  /* Numbers that change should not make their neighbours dance. */
+  .sn-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sn-sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@layer sn.components {
+  /* ── Continuous corner ─────────────────────────────────────────────────
+     Set --r to the radius you mean. Where the browser supports
+     corner-shape you get a continuous corner of the same perceived
+     roundness; elsewhere, an ordinary one. */
+  .sn-squircle {
+    border-radius: calc(var(--r, var(--sn-radius-lg)) * var(--sn-corner-scale));
+    corner-shape: var(--sn-corner-shape);
+  }
+
+  /* ── Surface ───────────────────────────────────────────────────────── */
+  .sn-surface {
+    --r: var(--sn-radius-lg);
+    background: var(--sn-bg-3);
+    border-radius: calc(var(--r) * var(--sn-corner-scale));
+    corner-shape: var(--sn-corner-shape);
+    box-shadow: var(--sn-edge), var(--sn-shadow-2);
+  }
+
+  /* ── Material: chrome that floats above content ────────────────────────
+     Use for bars, sheets and popovers, never for the content itself and
+     never stacked on another material. */
+  .sn-material {
+    background: var(--sn-material);
+    -webkit-backdrop-filter: var(--sn-material-filter);
+    backdrop-filter: var(--sn-material-filter);
+    box-shadow: var(--sn-edge), var(--sn-edge-top), var(--sn-shadow-3);
+  }
+
+  /* ── Button ────────────────────────────────────────────────────────────
+     Answers on the way down, not on the way up. The press is fast
+     (the finger is waiting); the release is a spring (the finger is gone). */
+  .sn-button {
+    --r: var(--sn-radius-full);
+    --_bg: var(--sn-fill-1);
+    --_fg: var(--sn-label);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sn-space-2);
+    min-block-size: var(--sn-hit);
+    padding: 0 var(--sn-space-5);
+    border: 0;
+    border-radius: var(--r);
+    background: var(--_bg);
+    color: var(--_fg);
+    font-weight: 590;
+    font-size: var(--sn-text-body);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      transform var(--sn-spring-micro-duration) var(--sn-spring-micro),
+      filter var(--sn-dur-fast) var(--sn-ease-out),
+      background-color var(--sn-dur-fast) var(--sn-ease-out),
+      opacity var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-button:active {
+    transform: scale(0.97);
+    filter: brightness(0.92);
+    transition-duration: var(--sn-dur-instant);
+    transition-timing-function: var(--sn-ease-out);
+  }
+  .sn-button[data-variant='primary'] {
+    --_bg: var(--sn-accent);
+    --_fg: var(--sn-on-accent);
+  }
+  .sn-button[data-variant='tinted'] {
+    --_bg: var(--sn-accent-soft);
+    --_fg: var(--sn-accent);
+  }
+  .sn-button[data-variant='plain'] {
+    --_bg: transparent;
+    --_fg: var(--sn-accent);
+  }
+  .sn-button[data-size='small'] {
+    min-block-size: 32px;
+    padding: 0 var(--sn-space-3);
+    font-size: var(--sn-text-subhead);
+  }
+  /* A small button still gets a full-size target. */
+  .sn-button[data-size='small']::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+  .sn-button:disabled,
+  .sn-button[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Hover exists only where a pointer can hover. On touch it would stick. */
+  @media (hover: hover) and (pointer: fine) {
+    .sn-button:hover:not(:active) {
+      filter: brightness(1.06);
+    }
+  }
+
+  /* ── Switch ────────────────────────────────────────────────────────────
+     <input type="checkbox" class="sn-switch" role="switch">
+     The thumb stretches toward where it is going while held, then springs. */
+  .sn-switch {
+    --w: 51px;
+    --h: 31px;
+    --pad: 2px;
+    appearance: none;
+    position: relative;
+    flex: none;
+    inline-size: var(--w);
+    block-size: var(--h);
+    margin: 0;
+    border-radius: var(--sn-radius-full);
+    background: var(--sn-fill-1);
+    cursor: pointer;
+    transition: background-color var(--sn-dur-base) var(--sn-ease-out);
+  }
+  .sn-switch::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--pad);
+    inset-inline-start: var(--pad);
+    inline-size: calc(var(--h) - var(--pad) * 2);
+    border-radius: var(--sn-radius-full);
+    background: #fff;
+    box-shadow:
+      0 0 0 0.5px rgb(0 0 0 / 0.04),
+      0 3px 8px rgb(0 0 0 / 0.15),
+      0 3px 1px rgb(0 0 0 / 0.06);
+    transition:
+      translate var(--sn-spring-snappy-duration) var(--sn-spring-snappy),
+      inline-size var(--sn-spring-micro-duration) var(--sn-spring-micro);
+  }
+  .sn-switch:checked {
+    background: var(--sn-success);
+  }
+  .sn-switch:checked::before {
+    translate: calc(var(--w) - var(--h)) 0;
+  }
+  .sn-switch:active::before {
+    inline-size: calc(var(--h) - var(--pad) * 2 + 6px);
+  }
+  .sn-switch:checked:active::before {
+    translate: calc(var(--w) - var(--h) - 6px) 0;
+  }
+  /* A switch is 31px tall; its target is not. */
+  .sn-switch::after {
+    content: '';
+    position: absolute;
+    inset: -7px -4px;
+  }
+
+  /* ── Segmented control ─────────────────────────────────────────────────
+     <div class="sn-segmented" style="--count: 3">
+       <label><input type="radio" name="x" checked>Day</label> …
+     </div>
+     One thumb slides between options: the selection is an object that moves,
+     not a highlight that teleports. Pure CSS up to six options. */
+  .sn-segmented {
+    --count: 2;
+    --active: 0;
+    --pad: 2px;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--count), 1fr);
+    padding: var(--pad);
+    border-radius: calc(var(--sn-radius-sm) + var(--pad));
+    background: var(--sn-fill-1);
+  }
+  .sn-segmented::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--pad);
+    inset-inline-start: var(--pad);
+    inline-size: calc((100% - var(--pad) * 2) / var(--count));
+    border-radius: var(--sn-radius-sm); /* concentric: outer − padding */
+    background: var(--sn-bg-3);
+    box-shadow:
+      0 0 0 0.5px rgb(0 0 0 / 0.04),
+      0 3px 8px rgb(0 0 0 / 0.12),
+      0 3px 1px rgb(0 0 0 / 0.04);
+    translate: calc(var(--active) * 100%) 0;
+    transition: translate var(--sn-spring-swift-duration) var(--sn-spring-swift);
+  }
+  .sn-segmented:has(label:nth-child(2) input:checked) {
+    --active: 1;
+  }
+  .sn-segmented:has(label:nth-child(3) input:checked) {
+    --active: 2;
+  }
+  .sn-segmented:has(label:nth-child(4) input:checked) {
+    --active: 3;
+  }
+  .sn-segmented:has(label:nth-child(5) input:checked) {
+    --active: 4;
+  }
+  .sn-segmented:has(label:nth-child(6) input:checked) {
+    --active: 5;
+  }
+  .sn-segmented label {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: 32px;
+    padding: 0 var(--sn-space-3);
+    font-size: var(--sn-text-footnote);
+    font-weight: 500;
+    color: var(--sn-label);
+    cursor: pointer;
+    transition: opacity var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-segmented label:active {
+    opacity: 0.6;
+  }
+  .sn-segmented label:has(input:checked) {
+    font-weight: 600;
+  }
+  .sn-segmented input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: inherit;
+  }
+  .sn-segmented:has(input:focus-visible) {
+    box-shadow: var(--sn-focus-ring);
+  }
+
+  /* ── Inset grouped list ────────────────────────────────────────────────
+     Separators start where the text starts, not at the icon: the eye follows
+     the text column, so the line belongs to it. */
+  .sn-list {
+    --r: var(--sn-radius-lg);
+    --inset: var(--sn-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--sn-bg-3);
+    border-radius: var(--r);
+    overflow: clip;
+  }
+  .sn-list > * {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sn-space-3);
+    min-block-size: var(--sn-hit);
+    padding: var(--sn-space-3) var(--sn-space-4);
+  }
+  .sn-list > * + *::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: var(--inset) 0;
+    block-size: 1px;
+    background: var(--sn-separator);
+    transform: scaleY(0.5); /* a hairline: one device pixel on 2x screens */
+    transform-origin: top;
+  }
+
+  /* ── Text field ────────────────────────────────────────────────────── */
+  .sn-field {
+    inline-size: 100%;
+    min-block-size: var(--sn-hit);
+    padding: 0 var(--sn-space-4);
+    border: 0;
+    border-radius: var(--sn-radius-md);
+    background: var(--sn-fill-2);
+    transition:
+      background-color var(--sn-dur-fast) var(--sn-ease-out),
+      box-shadow var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-field::placeholder {
+    color: var(--sn-label-3);
+  }
+  .sn-field:focus-visible {
+    background: var(--sn-bg-3);
+  }
+
+  /* ── Skeleton ──────────────────────────────────────────────────────────
+     A placeholder shaped like what is coming. Calmer than a spinner, and it
+     means nothing moves when the content lands. */
+  .sn-skeleton {
+    border-radius: var(--sn-radius-xs);
+    background: var(--sn-fill-1);
+    animation: sn-breathe 1.6s var(--sn-ease-in-out) infinite alternate;
+  }
+  @keyframes sn-breathe {
+    to {
+      opacity: 0.45;
+    }
+  }
+
+  /* ── Entrance ──────────────────────────────────────────────────────────
+     Things arrive from somewhere: slightly smaller, slightly lower, never
+     from nothing. Uses @starting-style, so no JavaScript and no flash. */
+  .sn-enter {
+    transition:
+      opacity var(--sn-dur-base) var(--sn-ease-out),
+      transform var(--sn-spring-swift-duration) var(--sn-spring-swift);
+    @starting-style {
+      opacity: 0;
+      transform: translateY(calc(8px * var(--sn-motion))) scale(calc(1 - 0.04 * var(--sn-motion)));
+    }
+  }
+}

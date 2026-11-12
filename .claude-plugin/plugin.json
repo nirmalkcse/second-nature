@@ -1,0 +1,10 @@
+{
+  "name": "second-nature",
+  "description": "Design, build and review interfaces that feel like second nature: Apple-grade simplicity, physics-based motion, continuous geometry, haptic-grade feedback, low cognitive load and zero lag, as rules, numbers, tokens and code for any platform.",
+  "version": "1.0.0",
+  "author": { "name": "nirmalkcse", "url": "https://github.com/nirmalkcse" },
+  "homepage": "https://github.com/nirmalkcse/second-nature",
+  "repository": "https://github.com/nirmalkcse/second-nature",
+  "license": "MIT",
+  "keywords": ["design", "ui", "ux", "animation", "motion", "frontend", "swiftui", "css", "accessibility", "design-system"]
+}

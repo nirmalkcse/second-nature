@@ -1,0 +1,14 @@
+{
+  "name": "second-nature",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An agent skill for designing interfaces that feel like second nature.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/physics.test.mjs && node tests/audit.test.mjs",
+    "demo": "node tools/build-demo.mjs",
+    "audit": "node skills/second-nature/scripts/audit.mjs",
+    "spring": "node skills/second-nature/scripts/spring.mjs"
+  }
+}

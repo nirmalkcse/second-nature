@@ -1,0 +1,10 @@
+html { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+button:active { transform: scale(0.97); }
+button:focus { outline: none; }
+button:focus-visible { box-shadow: 0 0 0 4px rgb(0 100 255 / 0.4); }
+.shell { min-height: 100dvh; }
+input { font-size: max(16px, 1em); }
+.sheet { transition: transform 700ms linear(0, 0.5 20%, 1); }
+@media (hover: hover) and (pointer: fine) { .row:hover { background: rgb(0 0 0 / 0.04); } }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }

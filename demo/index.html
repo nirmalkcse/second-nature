@@ -1,0 +1,2613 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+    <title>Second Nature — touch everything</title>
+    <meta name="description" content="An interactive tour of the Second Nature design skill: springs, momentum, continuous corners and feedback." />
+    <style>
+      /**
+ * second-nature · tokens.css
+ *
+ * One scale for each thing, used everywhere. Consistency is not a style: it is
+ * what lets a person learn an interface once.
+ *
+ * Every value here is a starting point. Keep the structure (one spacing scale,
+ * one radius scale, semantic colours, role-based motion); swap the values for
+ * the product's own brand. If the project already has tokens, map these names
+ * onto them instead of adding a second system.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* ── Space · 4pt base ───────────────────────────────────────────────────
+     Spacing carries meaning: closer means related. Use the small steps inside
+     a component, the large ones between groups, and let the jumps be obvious. */
+  --sn-space-1: 4px;
+  --sn-space-2: 8px;
+  --sn-space-3: 12px;
+  --sn-space-4: 16px;
+  --sn-space-5: 20px;
+  --sn-space-6: 24px;
+  --sn-space-8: 32px;
+  --sn-space-10: 40px;
+  --sn-space-12: 48px;
+  --sn-space-16: 64px;
+  --sn-space-20: 80px;
+  --sn-space-24: 96px;
+  --sn-space-32: 128px;
+
+  /* Page gutters and the measure for running text. */
+  --sn-gutter: clamp(16px, 5vw, 48px);
+  --sn-measure: 65ch;
+  --sn-content: 980px;
+  --sn-wide: 1240px;
+
+  /* Smallest thing a finger can reliably hit. Visual size may be smaller;
+     the hit area may not. */
+  --sn-hit: 44px;
+
+  /* ── Shape ──────────────────────────────────────────────────────────────
+     Three kinds of corner: fixed (these), capsule (--sn-radius-full), and
+     concentric: inner = outer − gap. Never the same radius on a parent and
+     the child it pads. */
+  --sn-radius-xs: 6px;
+  --sn-radius-sm: 10px;
+  --sn-radius-md: 14px;
+  --sn-radius-lg: 20px;
+  --sn-radius-xl: 28px;
+  --sn-radius-2xl: 38px;
+  --sn-radius-full: 9999px;
+
+  /* Continuous corners where the browser can draw them (see @supports below).
+     Elsewhere these resolve to an ordinary circular corner of the same size. */
+  --sn-corner-shape: round;
+  --sn-corner-scale: 1;
+
+  /* ── Type ───────────────────────────────────────────────────────────────
+     The system font is the one the person already reads all day, tuned for
+     their screen. Reach past it only with a reason. */
+  --sn-font: system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --sn-font-display: system-ui, -apple-system, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --sn-font-rounded: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --sn-font-serif: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif;
+  --sn-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Size / line-height / tracking travel together. Bigger text: tighter
+     leading, tighter tracking. Smaller text: the opposite. */
+  --sn-text-caption: 0.75rem;
+  --sn-text-footnote: 0.8125rem;
+  --sn-text-subhead: 0.9375rem;
+  --sn-text-body: 1.0625rem;
+  --sn-text-title-3: 1.25rem;
+  --sn-text-title-2: 1.375rem;
+  --sn-text-title-1: 1.75rem;
+  --sn-text-large-title: 2.125rem;
+  --sn-text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --sn-text-hero: clamp(3rem, 1.2rem + 7.2vw, 6.5rem);
+
+  --sn-leading-tight: 1.07;
+  --sn-leading-snug: 1.2;
+  --sn-leading-body: 1.47;
+
+  --sn-tracking-caption: 0.01em;
+  --sn-tracking-body: 0;
+  --sn-tracking-title: -0.01em;
+  --sn-tracking-display: -0.022em;
+
+  /* ── Colour · semantic, never literal ───────────────────────────────────
+     Name colours for what they mean. A component asks for "label", not
+     "#1d1d1f", so light, dark and high-contrast all come for free. */
+  --sn-bg: light-dark(#ffffff, #000000);
+  --sn-bg-2: light-dark(#f4f4f6, #151517);
+  --sn-bg-3: light-dark(#ffffff, #222225);
+
+  --sn-label: light-dark(rgb(0 0 0 / 0.88), rgb(255 255 255 / 0.93));
+  --sn-label-2: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.64));
+  --sn-label-3: light-dark(rgb(0 0 0 / 0.45), rgb(255 255 255 / 0.46));
+  --sn-label-4: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.22));
+
+  --sn-fill-1: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.15));
+  --sn-fill-2: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.1));
+  --sn-fill-3: light-dark(rgb(0 0 0 / 0.03), rgb(255 255 255 / 0.06));
+
+  --sn-separator: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.14));
+
+  /* One accent. It means "you can act here" and nothing else. */
+  --sn-accent: light-dark(oklch(0.55 0.2 257), oklch(0.7 0.16 255));
+  --sn-on-accent: #ffffff;
+  --sn-accent-soft: color-mix(in oklch, var(--sn-accent) 14%, transparent);
+
+  --sn-success: light-dark(oklch(0.6 0.16 150), oklch(0.76 0.19 150));
+  --sn-warning: light-dark(oklch(0.68 0.16 65), oklch(0.8 0.15 75));
+  --sn-danger: light-dark(oklch(0.58 0.22 27), oklch(0.7 0.19 25));
+
+  /* ── Depth ──────────────────────────────────────────────────────────────
+     Shadows come in layers: a tight one for contact, a wide one for ambient
+     light. Higher things cast softer, larger shadows. */
+  --sn-shadow-1: 0 1px 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 1px 3px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
+  --sn-shadow-2: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 6px 16px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.45));
+  --sn-shadow-3: 0 2px 6px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 16px 40px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.55));
+  --sn-shadow-4: 0 4px 12px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35)), 0 32px 80px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.65));
+
+  /* In the dark, shadows barely show: an edge of light does the lifting. */
+  --sn-edge: inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.12));
+  --sn-edge-top: inset 0 1px 0 light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.1));
+
+  /* Materials: translucent layers for chrome that floats over content. */
+  --sn-material-thin: light-dark(rgb(255 255 255 / 0.55), rgb(40 40 44 / 0.5));
+  --sn-material: light-dark(rgb(255 255 255 / 0.72), rgb(32 32 36 / 0.7));
+  --sn-material-thick: light-dark(rgb(255 255 255 / 0.86), rgb(28 28 31 / 0.86));
+  --sn-material-filter: blur(24px) saturate(180%);
+  --sn-scrim: light-dark(rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.56));
+
+  --sn-focus-ring: 0 0 0 4px color-mix(in oklch, var(--sn-accent) 38%, transparent);
+
+  --sn-z-raised: 1;
+  --sn-z-sticky: 100;
+  --sn-z-overlay: 1000;
+  --sn-z-modal: 1100;
+  --sn-z-toast: 1200;
+
+  /* ── Motion ─────────────────────────────────────────────────────────────
+     Role-based. Pick by what is happening, not by how it looks:
+       press / hover feedback       → instant, fast
+       menus, popovers, tabs        → swift spring
+       sheets, pages, big surfaces  → smooth spring
+       anything a gesture released  → JS spring with the gesture's velocity
+     Entering things decelerate (ease-out). Nothing in an interface should
+     ever start slowly, so there is no ease-in token. */
+  --sn-dur-instant: 100ms;
+  --sn-dur-fast: 160ms;
+  --sn-dur-base: 240ms;
+  --sn-dur-slow: 360ms;
+  --sn-dur-slower: 500ms;
+
+  --sn-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sn-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --sn-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Springs baked into linear() so they run off the main thread.
+     Regenerate with: node scripts/spring.mjs --tokens */
+  --sn-spring-micro: linear(0, 0.0281 2.78%, 0.0952 5.56%, 0.1821 8.33%, 0.3699 13.89%, 0.4584 16.67%, 0.5393 19.44%, 0.6114 22.22%, 0.6745 25%, 0.729 27.78%, 0.7756 30.56%, 0.815 33.33%, 0.8481 36.11%, 0.8986 41.67%, 0.9331 47.22%, 0.9563 52.78%, 0.9716 58.33%, 0.9906 72.22%, 1);
+  --sn-spring-micro-duration: 296ms;
+  --sn-spring-swift: linear(0, 0.0136 1.89%, 0.0484 3.77%, 0.0974 5.66%, 0.1552 7.55%, 0.3452 13.21%, 0.4656 16.98%, 0.5719 20.75%, 0.6189 22.64%, 0.7009 26.42%, 0.7676 30.19%, 0.821 33.96%, 0.8631 37.74%, 0.8959 41.51%, 0.9317 47.17%, 0.9556 52.83%, 0.9713 58.49%, 0.9842 66.04%, 0.9914 73.58%, 1);
+  --sn-spring-swift-duration: 442ms;
+  --sn-spring-smooth: linear(0, 0.0051 1.12%, 0.0189 2.25%, 0.0397 3.37%, 0.0965 5.62%, 0.1659 7.87%, 0.3552 13.48%, 0.4627 16.85%, 0.5589 20.22%, 0.6422 23.6%, 0.7125 26.97%, 0.7709 30.34%, 0.8186 33.71%, 0.8572 37.08%, 0.897 41.57%, 0.9263 46.07%, 0.9519 51.69%, 0.9715 58.43%, 0.9832 65.17%, 0.9918 74.16%, 1);
+  --sn-spring-smooth-duration: 737ms;
+  --sn-spring-snappy: linear(0, 0.0052 1.19%, 0.0195 2.38%, 0.0413 3.57%, 0.1018 5.95%, 0.1773 8.33%, 0.4297 15.48%, 0.5094 17.86%, 0.6177 21.43%, 0.6812 23.81%, 0.7374 26.19%, 0.8083 29.76%, 0.8644 33.33%, 0.9076 36.9%, 0.9399 40.48%, 0.9696 45.24%, 0.988 50%, 0.9984 54.76%, 1.0063 66.67%, 1);
+  --sn-spring-snappy-duration: 700ms;
+  --sn-spring-bouncy: linear(0, 0.0052 1.01%, 0.0197 2.02%, 0.0421 3.03%, 0.0712 4.04%, 0.1056 5.05%, 0.1445 6.06%, 0.2313 8.08%, 0.4674 13.13%, 0.6011 16.16%, 0.7187 19.19%, 0.7863 21.21%, 0.8448 23.23%, 0.9159 26.26%, 0.9684 29.29%, 1.0047 32.32%, 1.0214 34.34%, 1.0373 37.37%, 1.046 42.42%, 1.0415 47.47%, 1.0133 61.62%, 1.0023 70.71%, 0.998 82.83%, 1);
+  --sn-spring-bouncy-duration: 821ms;
+  --sn-spring-release: linear(0, 0.008 1.54%, 0.0298 3.08%, 0.0624 4.62%, 0.1034 6.15%, 0.2017 9.23%, 0.421 15.38%, 0.5257 18.46%, 0.621 21.54%, 0.7048 24.62%, 0.7763 27.69%, 0.8358 30.77%, 0.8841 33.85%, 0.9381 38.46%, 0.9637 41.54%, 0.9898 46.15%, 1.0049 50.77%, 1.0124 55.38%, 1.0147 64.62%, 1);
+  --sn-spring-release-duration: 542ms;
+
+  /* Multiply distances by this. Under reduced motion it becomes 0: things
+     still fade, they just stop travelling. */
+  --sn-motion: 1;
+}
+
+/* An explicit theme switch wins over the OS setting. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Continuous corners: fitted so the corner reads as round as the circular one
+   it replaces (max deviation ≈ 1% of the radius from an iOS-style corner). */
+@supports (corner-shape: superellipse(1.8)) {
+  :root {
+    --sn-corner-shape: superellipse(1.8);
+    --sn-corner-scale: 1.6;
+  }
+}
+
+/* Reduced motion is not "no feedback". Keep colour and opacity changes, drop
+   travel and overshoot, and shorten what remains. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sn-motion: 0;
+    --sn-dur-base: 160ms;
+    --sn-dur-slow: 200ms;
+    --sn-dur-slower: 200ms;
+    --sn-spring-micro: ease-out;
+    --sn-spring-micro-duration: 120ms;
+    --sn-spring-swift: ease-out;
+    --sn-spring-swift-duration: 160ms;
+    --sn-spring-smooth: ease-out;
+    --sn-spring-smooth-duration: 200ms;
+    --sn-spring-snappy: ease-out;
+    --sn-spring-snappy-duration: 200ms;
+    --sn-spring-bouncy: ease-out;
+    --sn-spring-bouncy-duration: 200ms;
+    --sn-spring-release: ease-out;
+    --sn-spring-release-duration: 200ms;
+  }
+}
+
+/* People who ask for less transparency get solid surfaces. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --sn-material-thin: var(--sn-bg-2);
+    --sn-material: var(--sn-bg-2);
+    --sn-material-thick: var(--sn-bg-2);
+    --sn-material-filter: none;
+  }
+}
+
+/* People who ask for more contrast get firmer text, edges and separators. */
+@media (prefers-contrast: more) {
+  :root {
+    --sn-label-2: light-dark(rgb(0 0 0 / 0.8), rgb(255 255 255 / 0.86));
+    --sn-label-3: light-dark(rgb(0 0 0 / 0.68), rgb(255 255 255 / 0.72));
+    --sn-separator: light-dark(rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.5));
+    --sn-edge: inset 0 0 0 1px light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.6));
+    --sn-material-thin: var(--sn-bg);
+    --sn-material: var(--sn-bg);
+    --sn-material-thick: var(--sn-bg);
+    --sn-material-filter: none;
+  }
+}
+
+      /**
+ * second-nature · base.css
+ *
+ * The floor, plus a handful of primitives that show the rules at work.
+ * Requires tokens.css. Everything is in @layer so a project's own styles
+ * always win without a specificity fight.
+ *
+ * This is a reference implementation, not a component library: read it for
+ * the decisions (each has its reason beside it), then build with the
+ * project's own stack.
+ */
+
+@layer sn.base, sn.components;
+
+@layer sn.base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%; /* no surprise font inflation in landscape */
+    -webkit-tap-highlight-color: transparent; /* we provide our own press state */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scrollbar-gutter: stable; /* content doesn't jump when a scrollbar appears */
+  }
+
+  body {
+    margin: 0;
+    background: var(--sn-bg);
+    color: var(--sn-label);
+    font: 400 var(--sn-text-body) / var(--sn-leading-body) var(--sn-font);
+    letter-spacing: var(--sn-tracking-body);
+    font-optical-sizing: auto;
+    font-kerning: normal;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--sn-font-display);
+    font-weight: 600;
+    line-height: var(--sn-leading-snug);
+    letter-spacing: var(--sn-tracking-title);
+    text-wrap: balance; /* no orphaned last word in a headline */
+  }
+
+  p {
+    margin: 0;
+    max-inline-size: var(--sn-measure);
+    text-wrap: pretty;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  /* Controls are things you press, not text you select or zoom. */
+  button,
+  [role='button'],
+  summary,
+  label {
+    touch-action: manipulation; /* no 300ms double-tap wait */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+
+  /* Below 16px, iOS zooms the page on focus and never zooms back. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  /* Focus is feedback for the keyboard. Show it only when the keyboard is in
+     use, and make it unmistakable when it is. */
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    box-shadow: var(--sn-focus-ring);
+    outline: 2px solid transparent; /* stays visible in forced-colors mode */
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--sn-accent) 28%, transparent);
+  }
+
+  /* Numbers that change should not make their neighbours dance. */
+  .sn-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sn-sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@layer sn.components {
+  /* ── Continuous corner ─────────────────────────────────────────────────
+     Set --r to the radius you mean. Where the browser supports
+     corner-shape you get a continuous corner of the same perceived
+     roundness; elsewhere, an ordinary one. */
+  .sn-squircle {
+    border-radius: calc(var(--r, var(--sn-radius-lg)) * var(--sn-corner-scale));
+    corner-shape: var(--sn-corner-shape);
+  }
+
+  /* ── Surface ───────────────────────────────────────────────────────── */
+  .sn-surface {
+    --r: var(--sn-radius-lg);
+    background: var(--sn-bg-3);
+    border-radius: calc(var(--r) * var(--sn-corner-scale));
+    corner-shape: var(--sn-corner-shape);
+    box-shadow: var(--sn-edge), var(--sn-shadow-2);
+  }
+
+  /* ── Material: chrome that floats above content ────────────────────────
+     Use for bars, sheets and popovers, never for the content itself and
+     never stacked on another material. */
+  .sn-material {
+    background: var(--sn-material);
+    -webkit-backdrop-filter: var(--sn-material-filter);
+    backdrop-filter: var(--sn-material-filter);
+    box-shadow: var(--sn-edge), var(--sn-edge-top), var(--sn-shadow-3);
+  }
+
+  /* ── Button ────────────────────────────────────────────────────────────
+     Answers on the way down, not on the way up. The press is fast
+     (the finger is waiting); the release is a spring (the finger is gone). */
+  .sn-button {
+    --r: var(--sn-radius-full);
+    --_bg: var(--sn-fill-1);
+    --_fg: var(--sn-label);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sn-space-2);
+    min-block-size: var(--sn-hit);
+    padding: 0 var(--sn-space-5);
+    border: 0;
+    border-radius: var(--r);
+    background: var(--_bg);
+    color: var(--_fg);
+    font-weight: 590;
+    font-size: var(--sn-text-body);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      transform var(--sn-spring-micro-duration) var(--sn-spring-micro),
+      filter var(--sn-dur-fast) var(--sn-ease-out),
+      background-color var(--sn-dur-fast) var(--sn-ease-out),
+      opacity var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-button:active {
+    transform: scale(0.97);
+    filter: brightness(0.92);
+    transition-duration: var(--sn-dur-instant);
+    transition-timing-function: var(--sn-ease-out);
+  }
+  .sn-button[data-variant='primary'] {
+    --_bg: var(--sn-accent);
+    --_fg: var(--sn-on-accent);
+  }
+  .sn-button[data-variant='tinted'] {
+    --_bg: var(--sn-accent-soft);
+    --_fg: var(--sn-accent);
+  }
+  .sn-button[data-variant='plain'] {
+    --_bg: transparent;
+    --_fg: var(--sn-accent);
+  }
+  .sn-button[data-size='small'] {
+    min-block-size: 32px;
+    padding: 0 var(--sn-space-3);
+    font-size: var(--sn-text-subhead);
+  }
+  /* A small button still gets a full-size target. */
+  .sn-button[data-size='small']::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+  .sn-button:disabled,
+  .sn-button[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Hover exists only where a pointer can hover. On touch it would stick. */
+  @media (hover: hover) and (pointer: fine) {
+    .sn-button:hover:not(:active) {
+      filter: brightness(1.06);
+    }
+  }
+
+  /* ── Switch ────────────────────────────────────────────────────────────
+     <input type="checkbox" class="sn-switch" role="switch">
+     The thumb stretches toward where it is going while held, then springs. */
+  .sn-switch {
+    --w: 51px;
+    --h: 31px;
+    --pad: 2px;
+    appearance: none;
+    position: relative;
+    flex: none;
+    inline-size: var(--w);
+    block-size: var(--h);
+    margin: 0;
+    border-radius: var(--sn-radius-full);
+    background: var(--sn-fill-1);
+    cursor: pointer;
+    transition: background-color var(--sn-dur-base) var(--sn-ease-out);
+  }
+  .sn-switch::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--pad);
+    inset-inline-start: var(--pad);
+    inline-size: calc(var(--h) - var(--pad) * 2);
+    border-radius: var(--sn-radius-full);
+    background: #fff;
+    box-shadow:
+      0 0 0 0.5px rgb(0 0 0 / 0.04),
+      0 3px 8px rgb(0 0 0 / 0.15),
+      0 3px 1px rgb(0 0 0 / 0.06);
+    transition:
+      translate var(--sn-spring-snappy-duration) var(--sn-spring-snappy),
+      inline-size var(--sn-spring-micro-duration) var(--sn-spring-micro);
+  }
+  .sn-switch:checked {
+    background: var(--sn-success);
+  }
+  .sn-switch:checked::before {
+    translate: calc(var(--w) - var(--h)) 0;
+  }
+  .sn-switch:active::before {
+    inline-size: calc(var(--h) - var(--pad) * 2 + 6px);
+  }
+  .sn-switch:checked:active::before {
+    translate: calc(var(--w) - var(--h) - 6px) 0;
+  }
+  /* A switch is 31px tall; its target is not. */
+  .sn-switch::after {
+    content: '';
+    position: absolute;
+    inset: -7px -4px;
+  }
+
+  /* ── Segmented control ─────────────────────────────────────────────────
+     <div class="sn-segmented" style="--count: 3">
+       <label><input type="radio" name="x" checked>Day</label> …
+     </div>
+     One thumb slides between options: the selection is an object that moves,
+     not a highlight that teleports. Pure CSS up to six options. */
+  .sn-segmented {
+    --count: 2;
+    --active: 0;
+    --pad: 2px;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--count), 1fr);
+    padding: var(--pad);
+    border-radius: calc(var(--sn-radius-sm) + var(--pad));
+    background: var(--sn-fill-1);
+  }
+  .sn-segmented::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--pad);
+    inset-inline-start: var(--pad);
+    inline-size: calc((100% - var(--pad) * 2) / var(--count));
+    border-radius: var(--sn-radius-sm); /* concentric: outer − padding */
+    background: var(--sn-bg-3);
+    box-shadow:
+      0 0 0 0.5px rgb(0 0 0 / 0.04),
+      0 3px 8px rgb(0 0 0 / 0.12),
+      0 3px 1px rgb(0 0 0 / 0.04);
+    translate: calc(var(--active) * 100%) 0;
+    transition: translate var(--sn-spring-swift-duration) var(--sn-spring-swift);
+  }
+  .sn-segmented:has(label:nth-child(2) input:checked) {
+    --active: 1;
+  }
+  .sn-segmented:has(label:nth-child(3) input:checked) {
+    --active: 2;
+  }
+  .sn-segmented:has(label:nth-child(4) input:checked) {
+    --active: 3;
+  }
+  .sn-segmented:has(label:nth-child(5) input:checked) {
+    --active: 4;
+  }
+  .sn-segmented:has(label:nth-child(6) input:checked) {
+    --active: 5;
+  }
+  .sn-segmented label {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: 32px;
+    padding: 0 var(--sn-space-3);
+    font-size: var(--sn-text-footnote);
+    font-weight: 500;
+    color: var(--sn-label);
+    cursor: pointer;
+    transition: opacity var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-segmented label:active {
+    opacity: 0.6;
+  }
+  .sn-segmented label:has(input:checked) {
+    font-weight: 600;
+  }
+  .sn-segmented input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: inherit;
+  }
+  .sn-segmented:has(input:focus-visible) {
+    box-shadow: var(--sn-focus-ring);
+  }
+
+  /* ── Inset grouped list ────────────────────────────────────────────────
+     Separators start where the text starts, not at the icon: the eye follows
+     the text column, so the line belongs to it. */
+  .sn-list {
+    --r: var(--sn-radius-lg);
+    --inset: var(--sn-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--sn-bg-3);
+    border-radius: var(--r);
+    overflow: clip;
+  }
+  .sn-list > * {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--sn-space-3);
+    min-block-size: var(--sn-hit);
+    padding: var(--sn-space-3) var(--sn-space-4);
+  }
+  .sn-list > * + *::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: var(--inset) 0;
+    block-size: 1px;
+    background: var(--sn-separator);
+    transform: scaleY(0.5); /* a hairline: one device pixel on 2x screens */
+    transform-origin: top;
+  }
+
+  /* ── Text field ────────────────────────────────────────────────────── */
+  .sn-field {
+    inline-size: 100%;
+    min-block-size: var(--sn-hit);
+    padding: 0 var(--sn-space-4);
+    border: 0;
+    border-radius: var(--sn-radius-md);
+    background: var(--sn-fill-2);
+    transition:
+      background-color var(--sn-dur-fast) var(--sn-ease-out),
+      box-shadow var(--sn-dur-fast) var(--sn-ease-out);
+  }
+  .sn-field::placeholder {
+    color: var(--sn-label-3);
+  }
+  .sn-field:focus-visible {
+    background: var(--sn-bg-3);
+  }
+
+  /* ── Skeleton ──────────────────────────────────────────────────────────
+     A placeholder shaped like what is coming. Calmer than a spinner, and it
+     means nothing moves when the content lands. */
+  .sn-skeleton {
+    border-radius: var(--sn-radius-xs);
+    background: var(--sn-fill-1);
+    animation: sn-breathe 1.6s var(--sn-ease-in-out) infinite alternate;
+  }
+  @keyframes sn-breathe {
+    to {
+      opacity: 0.45;
+    }
+  }
+
+  /* ── Entrance ──────────────────────────────────────────────────────────
+     Things arrive from somewhere: slightly smaller, slightly lower, never
+     from nothing. Uses @starting-style, so no JavaScript and no flash. */
+  .sn-enter {
+    transition:
+      opacity var(--sn-dur-base) var(--sn-ease-out),
+      transform var(--sn-spring-swift-duration) var(--sn-spring-swift);
+    @starting-style {
+      opacity: 0;
+      transform: translateY(calc(8px * var(--sn-motion))) scale(calc(1 - 0.04 * var(--sn-motion)));
+    }
+  }
+}
+
+
+      /* ── Page ─────────────────────────────────────────────────────────── */
+      main {
+        max-inline-size: 760px;
+        margin-inline: auto;
+        padding: 0 max(var(--sn-gutter), env(safe-area-inset-left)) var(--sn-space-32);
+      }
+      header.hero {
+        min-block-size: 78svh;
+        display: grid;
+        align-content: center;
+        gap: var(--sn-space-6);
+        padding-block: var(--sn-space-24);
+      }
+      .hero h1 {
+        font-size: var(--sn-text-hero);
+        line-height: var(--sn-leading-tight);
+        letter-spacing: var(--sn-tracking-display);
+        font-weight: 650;
+      }
+      .hero p {
+        font-size: var(--sn-text-title-2);
+        line-height: 1.35;
+        color: var(--sn-label-2);
+        max-inline-size: 26ch;
+      }
+      section {
+        padding-block: var(--sn-space-16);
+      }
+      .eyebrow {
+        font-size: var(--sn-text-footnote);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--sn-label-3);
+        margin-block-end: var(--sn-space-3);
+      }
+      section h2 {
+        font-size: var(--sn-text-large-title);
+        letter-spacing: var(--sn-tracking-display);
+        line-height: var(--sn-leading-tight);
+      }
+      section > p {
+        margin-block: var(--sn-space-3) var(--sn-space-8);
+        color: var(--sn-label-2);
+      }
+      .demo {
+        --r: var(--sn-radius-xl);
+        position: relative;
+        background: var(--sn-bg-2);
+        border-radius: calc(var(--r) * var(--sn-corner-scale));
+        corner-shape: var(--sn-corner-shape);
+        padding: var(--sn-space-6);
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--sn-space-4);
+        margin-block-start: var(--sn-space-5);
+      }
+      .readout {
+        font: 500 var(--sn-text-footnote) / 1.4 var(--sn-font-mono);
+        font-variant-numeric: tabular-nums;
+        color: var(--sn-label-2);
+      }
+
+      /* ── 1 · Throw ────────────────────────────────────────────────────── */
+      .stage {
+        position: relative;
+        block-size: clamp(240px, 46vw, 340px);
+        border-radius: var(--sn-radius-lg);
+        background:
+          radial-gradient(circle at 1px 1px, var(--sn-label-4) 1px, transparent 0) 0 0 / 20px 20px,
+          var(--sn-bg);
+        overflow: hidden;
+        touch-action: none;
+      }
+      .puck {
+        --r: 20px;
+        position: absolute;
+        inset: 0 auto auto 0;
+        inline-size: 76px;
+        block-size: 76px;
+        background: linear-gradient(160deg, color-mix(in oklch, var(--sn-accent) 82%, white), var(--sn-accent));
+        box-shadow: var(--sn-shadow-2), inset 0 1px 0 rgb(255 255 255 / 0.35);
+        cursor: grab;
+        touch-action: none;
+        transition:
+          scale var(--sn-spring-snappy-duration) var(--sn-spring-snappy),
+          box-shadow var(--sn-dur-base) var(--sn-ease-out);
+      }
+      .puck.held {
+        cursor: grabbing;
+        scale: 1.07; /* picked up: closer to you, bigger shadow */
+        box-shadow: var(--sn-shadow-4), inset 0 1px 0 rgb(255 255 255 / 0.35);
+      }
+
+      /* ── 2 · Sheet ────────────────────────────────────────────────────── */
+      .device-wrap {
+        display: grid;
+        place-items: center;
+      }
+      .device {
+        position: relative;
+        inline-size: min(100%, 290px);
+        block-size: 520px;
+        border-radius: 44px;
+        background: var(--sn-bg);
+        box-shadow: 0 0 0 8px var(--sn-fill-1), var(--sn-shadow-3);
+        overflow: hidden;
+      }
+      .device-content {
+        padding: 56px 20px 0;
+        display: grid;
+        gap: 12px;
+      }
+      .device-content i {
+        display: block;
+        block-size: 12px;
+        border-radius: 6px;
+        background: var(--sn-fill-1);
+      }
+      .device-content i:first-child {
+        block-size: 26px;
+        inline-size: 55%;
+        margin-block-end: 8px;
+        background: var(--sn-fill-1);
+      }
+      .scrim {
+        position: absolute;
+        inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .sheet {
+        position: absolute;
+        inset: 0;
+        border-radius: 32px 32px 0 0;
+        padding: 0 20px;
+        cursor: grab;
+        will-change: transform;
+      }
+      .grabber {
+        inline-size: 36px;
+        block-size: 5px;
+        margin: 8px auto 14px;
+        border-radius: 3px;
+        background: var(--sn-label-4);
+      }
+      .sheet h3 {
+        font-size: var(--sn-text-title-3);
+      }
+      .sheet small {
+        color: var(--sn-label-2);
+        font-size: var(--sn-text-subhead);
+      }
+      .sheet .sn-list {
+        margin-block-start: 22px;
+        background: var(--sn-fill-2);
+        font-size: var(--sn-text-subhead);
+      }
+
+      /* ── 3 · Slide to confirm ─────────────────────────────────────────── */
+      .slide {
+        position: relative;
+        block-size: 64px;
+        padding: 4px;
+        border-radius: 32px;
+        background: var(--sn-fill-1);
+        overflow: hidden;
+      }
+      .slide-label {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding-inline-start: 40px;
+        font-weight: 500;
+        color: var(--sn-label-2);
+        pointer-events: none;
+      }
+      .slide-fill {
+        position: absolute;
+        inset: 0;
+        background: var(--sn-success);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .knob {
+        position: relative;
+        inline-size: 56px;
+        block-size: 56px;
+        border-radius: 28px; /* concentric: 32 − 4 */
+        display: grid;
+        place-items: center;
+        background: var(--sn-bg-3);
+        color: var(--sn-label);
+        box-shadow: var(--sn-shadow-2);
+        cursor: grab;
+      }
+      .knob svg {
+        inline-size: 22px;
+        block-size: 22px;
+        transition: opacity var(--sn-dur-fast) var(--sn-ease-out);
+      }
+      .knob .check {
+        position: absolute;
+        opacity: 0;
+        color: var(--sn-success);
+      }
+      .slide.done .arrow {
+        opacity: 0;
+      }
+      .slide.done .check {
+        opacity: 1;
+      }
+      .ticks {
+        position: relative;
+        block-size: 18px;
+        margin: 6px 32px 0;
+        font: 500 11px/1 var(--sn-font-mono);
+        color: var(--sn-label-3);
+      }
+      .ticks span {
+        position: absolute;
+        inset-block-start: 6px;
+        translate: -50% 0;
+      }
+      .ticks span::before {
+        content: '';
+        position: absolute;
+        inset: -6px auto auto 50%;
+        inline-size: 1px;
+        block-size: 4px;
+        background: currentColor;
+      }
+
+      /* ── 4 · Corners ──────────────────────────────────────────────────── */
+      .corners {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--sn-space-6);
+        align-items: center;
+      }
+      .corners figure {
+        margin: 0;
+        display: grid;
+        gap: var(--sn-space-3);
+        justify-items: center;
+      }
+      .corners figcaption {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+        text-align: center;
+      }
+      .corners svg {
+        inline-size: 100%;
+        max-inline-size: 260px;
+      }
+      #zoom {
+        max-inline-size: 180px;
+        aspect-ratio: 1;
+        border-radius: var(--sn-radius-md);
+        background: var(--sn-bg);
+        overflow: hidden;
+      }
+      .legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-inline: 6px;
+      }
+      .legend::before {
+        content: '';
+        inline-size: 14px;
+        block-size: 2px;
+        border-radius: 1px;
+        background: var(--c);
+      }
+      input[type='range'] {
+        flex: 1;
+        min-inline-size: 140px;
+        accent-color: var(--sn-accent);
+        block-size: var(--sn-hit);
+        margin: 0;
+      }
+
+      /* ── 5 · Concentric ───────────────────────────────────────────────── */
+      .nest {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--sn-space-6);
+      }
+      .nest figure {
+        margin: 0;
+        display: grid;
+        gap: var(--sn-space-3);
+      }
+      .nest .outer {
+        --R: 40px;
+        --p: 12px;
+        padding: var(--p);
+        border-radius: var(--R);
+        background: var(--sn-bg-3);
+        box-shadow: var(--sn-edge), var(--sn-shadow-1);
+      }
+      .nest .inner {
+        block-size: 96px;
+        background: var(--sn-accent-soft);
+        box-shadow: inset 0 0 0 1.5px var(--sn-accent);
+      }
+      .nest .wrong .inner {
+        border-radius: var(--R);
+      }
+      .nest .right .inner {
+        border-radius: max(var(--R) - var(--p), 4px);
+      }
+      .nest figcaption {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+      }
+
+      /* ── 6 · Controls ─────────────────────────────────────────────────── */
+      .controls {
+        display: grid;
+        gap: var(--sn-space-6);
+      }
+      .controls .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sn-space-3);
+      }
+      .controls .sn-list > * {
+        justify-content: space-between;
+      }
+      .controls .sn-list small {
+        display: block;
+        color: var(--sn-label-2);
+        font-size: var(--sn-text-footnote);
+        line-height: 1.3;
+      }
+
+      /* ── 7 · Jiggle ───────────────────────────────────────────────────── */
+      .icons {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: clamp(10px, 3vw, 22px);
+        padding: var(--sn-space-2);
+      }
+      .icons i {
+        --r: 15px;
+        aspect-ratio: 1;
+        background: var(--c);
+        border-radius: calc(var(--r) * var(--sn-corner-scale));
+        corner-shape: var(--sn-corner-shape);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
+      }
+      .icons i.wide {
+        grid-column: span 2;
+        grid-row: span 2;
+        aspect-ratio: auto;
+        --r: 26px;
+      }
+      .icons.sync i {
+        animation: in-step 128ms ease-in-out infinite alternate;
+      }
+      @keyframes in-step {
+        from {
+          rotate: -1.72deg;
+        }
+        to {
+          rotate: 1.72deg;
+        }
+      }
+
+      /* ── 8 · Calm numbers ─────────────────────────────────────────────── */
+      .calm {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--sn-space-6);
+      }
+      .calm div {
+        display: grid;
+        gap: var(--sn-space-2);
+      }
+      .calm b {
+        font: 600 clamp(2.2rem, 9vw, 3.6rem) / 1 var(--sn-font-display);
+        letter-spacing: var(--sn-tracking-display);
+        font-variant-numeric: tabular-nums;
+      }
+      .calm .raw b {
+        color: var(--sn-label-3);
+      }
+      .calm span {
+        font-size: var(--sn-text-footnote);
+        color: var(--sn-label-2);
+      }
+      .bar {
+        block-size: 6px;
+        border-radius: 3px;
+        background: var(--sn-fill-1);
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        block-size: 100%;
+        inline-size: 100%;
+        border-radius: 3px;
+        background: var(--sn-label);
+        transform-origin: left;
+      }
+      .raw .bar i {
+        background: var(--sn-label-3);
+      }
+
+      footer {
+        padding-block: var(--sn-space-16) 0;
+        color: var(--sn-label-3);
+        font-size: var(--sn-text-footnote);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <h1>Second Nature</h1>
+        <p>Interfaces that behave like objects. Touch everything on this page.</p>
+      </header>
+
+      <section aria-labelledby="t1">
+        <div class="eyebrow">Physics</div>
+        <h2 id="t1">Throw it.</h2>
+        <p>
+          While you hold it, it is your finger. When you let go, a spring takes over at exactly the speed you were moving and lands where
+          the throw was heading. Catch it mid-flight: nothing waits for an animation to finish.
+        </p>
+        <div class="demo">
+          <div class="stage" id="stage"><div class="puck sn-squircle" id="puck" role="img" aria-label="Draggable tile"></div></div>
+          <div class="row">
+            <div class="sn-segmented" id="springPick" style="--count: 3; min-inline-size: 240px">
+              <label><input type="radio" name="spring" value="0" />Smooth</label>
+              <label><input type="radio" name="spring" value="0.15" checked />Snappy</label>
+              <label><input type="radio" name="spring" value="0.3" />Bouncy</label>
+            </div>
+            <div class="readout" id="springOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t2">
+        <div class="eyebrow">Edges</div>
+        <h2 id="t2">Pull past the end.</h2>
+        <p>
+          Nothing in the world stops dead. Past its limit the sheet keeps following, less and less, and never more than its own height.
+          Flick it and it settles on the stop nearest to where momentum would have carried it.
+        </p>
+        <div class="demo device-wrap">
+          <div class="device">
+            <div class="device-content"><i></i><i></i><i style="inline-size: 82%"></i><i style="inline-size: 64%"></i><i></i><i style="inline-size: 74%"></i></div>
+            <div class="scrim" id="scrim"></div>
+            <div class="sheet sn-material" id="sheet">
+              <div class="grabber"></div>
+              <h3>Up Next</h3>
+              <small>Drag, flick, or catch it on the way.</small>
+              <ul class="sn-list">
+                <li>Morning</li>
+                <li>Quiet hours</li>
+                <li>Evening</li>
+                <li>Night</li>
+              </ul>
+            </div>
+          </div>
+          <div class="readout" id="sheetOut" style="margin-block-start: 20px">following 1:1</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t3">
+        <div class="eyebrow">Intent</div>
+        <h2 id="t3">Slide to confirm.</h2>
+        <p>
+          There is no resistance here: the weight you feel is the spring back. It commits when where you were <em>going</em> passes 85%,
+          so a slow drag has to reach the line and a confident flick gets there on momentum.
+        </p>
+        <div class="demo">
+          <div class="slide" id="slide">
+            <div class="slide-fill" id="slideFill"></div>
+            <div class="slide-label" id="slideLabel">slide to confirm</div>
+            <div class="knob" id="knob" role="slider" aria-label="Slide to confirm" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+            </div>
+          </div>
+          <div class="ticks"><span style="inset-inline-start: 85%">85%</span></div>
+          <div class="readout" id="slideOut" style="margin-block-start: 14px">projected 0%</div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t4">
+        <div class="eyebrow">Geometry</div>
+        <h2 id="t4">Corners that flow.</h2>
+        <p>
+          A standard rounded corner is a straight line that abruptly becomes a circle. A continuous corner eases into the curve, the way
+          a machined edge does. You notice the first one. You never notice the second.
+        </p>
+        <div class="demo">
+          <div class="corners">
+            <figure>
+              <svg id="shapes" viewBox="0 0 260 120" aria-hidden="true"></svg>
+              <figcaption>Circular arc · Continuous</figcaption>
+            </figure>
+            <figure>
+              <svg id="zoom" viewBox="0 0 120 120" aria-hidden="true"></svg>
+              <figcaption>
+                <span class="legend" style="--c: var(--sn-label)">arc</span><span class="legend" style="--c: var(--sn-accent)">continuous</span>
+              </figcaption>
+            </figure>
+          </div>
+          <div class="row">
+            <input type="range" id="radius" min="8" max="56" value="32" aria-label="Corner radius" />
+            <div class="readout" id="radiusOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t5">
+        <div class="eyebrow">Geometry</div>
+        <h2 id="t5">Inner = outer − gap.</h2>
+        <p>Give a child the same radius as its parent and the gap between them pinches at every corner. Subtract the padding and the two curves share a centre.</p>
+        <div class="demo">
+          <div class="nest" id="nest">
+            <figure class="wrong">
+              <div class="outer"><div class="inner"></div></div>
+              <figcaption id="wrongOut"></figcaption>
+            </figure>
+            <figure class="right">
+              <div class="outer"><div class="inner"></div></div>
+              <figcaption id="rightOut"></figcaption>
+            </figure>
+          </div>
+          <div class="row">
+            <input type="range" id="gap" min="4" max="32" value="12" aria-label="Padding" />
+            <div class="readout" id="gapOut"></div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t6">
+        <div class="eyebrow">Feedback</div>
+        <h2 id="t6">Controls that answer.</h2>
+        <p>Every press is acknowledged on the way down, before you lift. Selections are objects that slide, not highlights that teleport.</p>
+        <div class="demo controls">
+          <div class="buttons">
+            <button class="sn-button" data-variant="primary" data-fb="medium">Continue</button>
+            <button class="sn-button" data-variant="tinted" data-fb="light">Not now</button>
+            <button class="sn-button" data-fb="light">Details</button>
+          </div>
+          <div class="sn-segmented" style="--count: 3" data-fb-change="selection">
+            <label><input type="radio" name="range" checked />Day</label>
+            <label><input type="radio" name="range" />Week</label>
+            <label><input type="radio" name="range" />Month</label>
+          </div>
+          <ul class="sn-list">
+            <li>
+              <label for="sound">Sound<small>Off until you ask for it.</small></label>
+              <input class="sn-switch" type="checkbox" role="switch" id="sound" />
+            </li>
+            <li>
+              <label for="haptics">Haptics<small>Where the device has them.</small></label>
+              <input class="sn-switch" type="checkbox" role="switch" id="haptics" checked />
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="t7">
+        <div class="eyebrow">Details</div>
+        <h2 id="t7">Alive, not looping.</h2>
+        <p>
+          One animation on every tile moves like a machine. Three slightly different clocks per tile, each started at a random moment,
+          take about twenty minutes to repeat. Bigger tiles tilt less, so their edges travel the same distance.
+        </p>
+        <div class="demo">
+          <div class="icons" id="icons"></div>
+          <div class="row">
+            <div class="sn-segmented" id="jigglePick" style="--count: 3; min-inline-size: 260px">
+              <label><input type="radio" name="jig" value="still" checked />Still</label>
+              <label><input type="radio" name="jig" value="organic" />Organic</label>
+              <label><input type="radio" name="jig" value="sync" />In step</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="t8">
+        <div class="eyebrow">Trust</div>
+        <h2 id="t8">Calm numbers.</h2>
+        <p>Measurements jitter. A readout that jitters with them looks broken. Show a filtered value that moves in small, orderly steps and never backtracks.</p>
+        <div class="demo calm">
+          <div class="raw">
+            <span>Measured</span>
+            <b id="rawOut">100.0%</b>
+            <div class="bar"><i id="rawBar"></i></div>
+          </div>
+          <div>
+            <span>Shown</span>
+            <b id="shownOut">100%</b>
+            <div class="bar"><i id="shownBar"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <footer>Built with the Second Nature skill: tokens.css, base.css, physics.js, squircle.js and feedback.js, with nothing else.</footer>
+    </main>
+
+    <script type="module">
+      const Physics = (() => {
+/**
+ * second-nature · physics.js
+ *
+ * Zero-dependency motion physics for interfaces that behave like objects:
+ * springs you can interrupt, momentum you can project, edges that resist.
+ *
+ * ES module. The maths runs anywhere (browser, Node, workers);
+ * `animate`, `decay` and `draggable` need a DOM-like clock or element.
+ *
+ * Units: positions in px (or any unit), velocities in units PER SECOND,
+ * durations in seconds unless a name says `Ms`.
+ */
+
+const TAU = Math.PI * 2;
+const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 1. Spring parameters
+ *
+ * Designers think in two numbers: how long it takes and how much it bounces.
+ * Physics engines think in mass, stiffness and damping. These convert.
+ * (Same parameterisation as SwiftUI's Spring(duration:bounce:), mass = 1.)
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {number} duration  Perceptual duration in seconds. Not the settle time:
+ *                           a spring has no fixed end, it just gets close.
+ * @param {number} bounce    0 = no overshoot (critically damped). 0.15 = a little,
+ *                           0.3 = clearly bouncy. Above ~0.4 looks like a toy.
+ *                           Negative values over-damp (slower, flatter).
+ */
+function springFromBounce(duration = 0.5, bounce = 0) {
+  const d = Math.max(duration, 0.01);
+  const b = clamp(bounce, -0.99, 0.99);
+  const stiffness = (TAU / d) ** 2;
+  const dampingRatio = b >= 0 ? 1 - b : 1 / (1 + b);
+  const damping = dampingRatio * 2 * Math.sqrt(stiffness);
+  return { mass: 1, stiffness, damping, dampingRatio, duration: d, bounce: b };
+}
+
+/** The other direction: physical parameters → duration / bounce. */
+function springFromPhysical({ mass = 1, stiffness = 100, damping = 10 } = {}) {
+  const dampingRatio = damping / (2 * Math.sqrt(stiffness * mass));
+  const duration = TAU / Math.sqrt(stiffness / mass);
+  const bounce = dampingRatio <= 1 ? 1 - dampingRatio : 1 / dampingRatio - 1;
+  return { mass, stiffness, damping, dampingRatio, duration, bounce };
+}
+
+/**
+ * Named springs. `smooth`, `snappy`, `bouncy` and `interactive` mirror the
+ * SwiftUI presets; the rest are role-based starting points. Tune by feel.
+ */
+const SPRINGS = Object.freeze({
+  micro: springFromBounce(0.2, 0), // press release, toggle thumbs, hover-out
+  swift: springFromBounce(0.3, 0), // menus, popovers, tabs, small state changes
+  smooth: springFromBounce(0.5, 0), // sheets, page-level moves, large surfaces
+  snappy: springFromBounce(0.5, 0.15), // general purpose with a hint of life
+  bouncy: springFromBounce(0.5, 0.3), // playful, rare, small elements only
+  release: springFromBounce(0.4, 0.2), // after a drag or flick: momentum earned it
+  interactive: springFromBounce(0.15, 0.14), // chasing a target that keeps moving
+});
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 2. Closed-form spring solver
+ *
+ * Exact at any t, so frame rate never changes the motion and an interrupted
+ * animation can restart from precisely where (and how fast) it was.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * State of a spring at time t.
+ * @returns {{ value: number, velocity: number }}
+ */
+function springAt(t, { from = 0, to = 1, velocity = 0, spring = SPRINGS.smooth } = {}) {
+  const { mass, stiffness, damping } = spring;
+  const w0 = Math.sqrt(stiffness / mass);
+  const zeta = damping / (2 * Math.sqrt(stiffness * mass));
+  const x0 = from - to;
+  const v0 = velocity;
+  let x;
+  let v;
+
+  if (zeta < 1 - 1e-6) {
+    const wd = w0 * Math.sqrt(1 - zeta * zeta);
+    const a = zeta * w0;
+    const B = (v0 + a * x0) / wd;
+    const e = Math.exp(-a * t);
+    const cos = Math.cos(wd * t);
+    const sin = Math.sin(wd * t);
+    x = e * (x0 * cos + B * sin);
+    v = e * ((B * wd - a * x0) * cos - (a * B + x0 * wd) * sin);
+  } else if (zeta <= 1 + 1e-6) {
+    const B = v0 + w0 * x0;
+    const e = Math.exp(-w0 * t);
+    x = (x0 + B * t) * e;
+    v = (B - w0 * (x0 + B * t)) * e;
+  } else {
+    const s = Math.sqrt(zeta * zeta - 1);
+    const r1 = -w0 * (zeta - s);
+    const r2 = -w0 * (zeta + s);
+    const c1 = (v0 - r2 * x0) / (r1 - r2);
+    const c2 = x0 - c1;
+    const e1 = Math.exp(r1 * t);
+    const e2 = Math.exp(r2 * t);
+    x = c1 * e1 + c2 * e2;
+    v = c1 * r1 * e1 + c2 * r2 * e2;
+  }
+  return { value: to + x, velocity: v };
+}
+
+/**
+ * Seconds until the spring stays within `restDelta` of the target.
+ * Useful for CSS durations; never gate user input on it.
+ */
+function settleTime({ from = 0, to = 1, velocity = 0, spring = SPRINGS.smooth, restDelta } = {}) {
+  const span = Math.abs(to - from) || 1;
+  const delta = restDelta ?? span * 0.001;
+  const step = 1 / 240;
+  let lastOutside = 0;
+  for (let t = 0; t <= 10; t += step) {
+    const s = springAt(t, { from, to, velocity, spring });
+    if (Math.abs(s.value - to) > delta) lastOutside = t;
+    else if (t - lastOutside > 0.1) break;
+  }
+  return lastOutside + step;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 3. Springs as CSS: bake a spring into a linear() easing
+ *
+ * For motion that has a fixed start and end and never needs a gesture's
+ * velocity. Runs off the main thread, so it stays smooth under load.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @returns {{ easing: string, durationMs: number }}
+ *   e.g. `transition: transform ${durationMs}ms ${easing}`
+ */
+function springToCSS(spring = SPRINGS.smooth, { tolerance = 0.0025 } = {}) {
+  const total = settleTime({ from: 0, to: 1, spring, restDelta: 0.001 });
+  const n = Math.max(24, Math.ceil(total * 120));
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const p = i / n;
+    pts.push([p, springAt(p * total, { from: 0, to: 1, spring }).value]);
+  }
+  pts[pts.length - 1][1] = 1;
+  const kept = simplify(pts, tolerance);
+  const body = kept
+    .map(([p, v], i) => {
+      const val = round(v, 4);
+      if (i === 0 || i === kept.length - 1) return `${val}`;
+      return `${val} ${round(p * 100, 2)}%`;
+    })
+    .join(', ');
+  return { easing: `linear(${body})`, durationMs: Math.round(total * 1000) };
+}
+
+function round(v, places) {
+  const f = 10 ** places;
+  return Math.round(v * f) / f;
+}
+
+/** Ramer–Douglas–Peucker: keep only the points that shape the curve. */
+function simplify(points, tolerance) {
+  if (points.length <= 2) return points;
+  const keep = new Uint8Array(points.length);
+  keep[0] = keep[points.length - 1] = 1;
+  const stack = [[0, points.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop();
+    const [x1, y1] = points[a];
+    const [x2, y2] = points[b];
+    let worst = 0;
+    let index = -1;
+    for (let i = a + 1; i < b; i++) {
+      const [x, y] = points[i];
+      const onLine = y1 + ((y2 - y1) * (x - x1)) / (x2 - x1 || 1);
+      const d = Math.abs(y - onLine);
+      if (d > worst) {
+        worst = d;
+        index = i;
+      }
+    }
+    if (worst > tolerance && index > 0) {
+      keep[index] = 1;
+      stack.push([a, index], [index, b]);
+    }
+  }
+  return points.filter((_, i) => keep[i]);
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 4. Edges and momentum
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Rubber-banding: the further you pull past an edge, the less it follows.
+ * It approaches `dimension` but never reaches it, so it always gives a little.
+ *
+ * @param {number} overshoot   distance past the edge (signed)
+ * @param {number} dimension   size of the view along this axis
+ * @param {number} coefficient 0.55 is the classic scroll-view feel
+ */
+function rubberband(overshoot, dimension, coefficient = 0.55) {
+  if (!(dimension > 0) || overshoot === 0) return 0;
+  const x = Math.abs(overshoot);
+  return Math.sign(overshoot) * (1 - 1 / ((x * coefficient) / dimension + 1)) * dimension;
+}
+
+/** Follow 1:1 inside [min, max]; resist progressively outside it. */
+function rubberbandClamp(value, min, max, dimension = max - min, coefficient = 0.55) {
+  const dim = dimension > 0 ? dimension : 1;
+  if (value < min) return min - rubberband(min - value, dim, coefficient);
+  if (value > max) return max + rubberband(value - max, dim, coefficient);
+  return value;
+}
+
+/** Fraction of velocity kept per millisecond, as scroll views define it. */
+const DECELERATION = Object.freeze({ normal: 0.998, fast: 0.99 });
+
+/**
+ * How far momentum will carry something released at `velocity` (units/s).
+ * Decide where a flick lands from this, not from where the finger let go.
+ */
+function project(velocity, decelerationRate = DECELERATION.normal) {
+  return ((velocity / 1000) * decelerationRate) / (1 - decelerationRate);
+}
+
+/** State of a free glide (inertial scrolling) at time t. */
+function decayAt(t, { from = 0, velocity = 0, decelerationRate = DECELERATION.normal } = {}) {
+  const k = Math.log(decelerationRate) * 1000; // per second, negative
+  const e = Math.exp(k * t);
+  return { value: from + (velocity * (e - 1)) / k, velocity: velocity * e };
+}
+
+/** The value in `points` closest to `value`. */
+function nearest(points, value) {
+  let best = points[0];
+  for (const p of points) if (Math.abs(p - value) < Math.abs(best - value)) best = p;
+  return best;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 5. Velocity tracking
+ *
+ * Release velocity comes from the last ~100ms of movement, not the whole
+ * gesture and not the last two samples (which are noise).
+ * ──────────────────────────────────────────────────────────────────────── */
+
+class VelocityTracker {
+  constructor({ windowMs = 100, staleMs = 60 } = {}) {
+    this.windowMs = windowMs;
+    this.staleMs = staleMs;
+    this.samples = [];
+  }
+
+  reset() {
+    this.samples.length = 0;
+  }
+
+  /** @param {number} value position  @param {number} timeMs timestamp (event.timeStamp) */
+  add(value, timeMs = now()) {
+    const s = this.samples;
+    s.push(value, timeMs);
+    while (s.length > 4 && timeMs - s[1] > this.windowMs) s.splice(0, 2);
+  }
+
+  /**
+   * Units per second. Returns 0 if the pointer rested before lifting,
+   * because a paused finger is a decision to drop, not to throw.
+   */
+  velocity(atMs = now()) {
+    const s = this.samples;
+    if (s.length < 4) return 0;
+    const lastT = s[s.length - 1];
+    if (atMs - lastT > this.staleMs) return 0;
+    const dt = lastT - s[1];
+    if (dt <= 0) return 0;
+    return ((s[s.length - 2] - s[0]) / dt) * 1000;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 6. Animation drivers (interruptible by construction)
+ * ──────────────────────────────────────────────────────────────────────── */
+
+const hasWindow = typeof window !== 'undefined';
+const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+const raf = (fn) => (hasWindow && window.requestAnimationFrame ? window.requestAnimationFrame(fn) : setTimeout(() => fn(now()), 1000 / 60));
+const caf = (id) => (hasWindow && window.cancelAnimationFrame ? window.cancelAnimationFrame(id) : clearTimeout(id));
+
+function prefersReducedMotion() {
+  return hasWindow && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Drive a value with a spring.
+ *
+ *   const a = animate({ from: 0, to: 300, velocity: 1200, onUpdate: v => … });
+ *   a.retarget(0);   // changes its mind mid-flight, keeps its velocity
+ *   a.stop();        // returns { value, velocity } so a drag can take over
+ *
+ * Under prefers-reduced-motion the spring loses its bounce: the element still
+ * arrives where physics says it should, without the overshoot.
+ */
+function animate({
+  from = 0,
+  to = 1,
+  velocity = 0,
+  spring = SPRINGS.smooth,
+  onUpdate = () => {},
+  onComplete = () => {},
+  restDelta = 0.05,
+  restSpeed = 2,
+  respectReducedMotion = true,
+} = {}) {
+  let s = spring;
+  if (respectReducedMotion && prefersReducedMotion() && s.bounce > 0) s = springFromBounce(s.duration, 0);
+
+  let origin = from;
+  let target = to;
+  let v0 = velocity;
+  let t0 = now();
+  let current = { value: from, velocity };
+  let frame = 0;
+  let done = false;
+  let resolve;
+  const finished = new Promise((r) => (resolve = r));
+
+  const tick = () => {
+    if (done) return;
+    const t = (now() - t0) / 1000;
+    current = springAt(t, { from: origin, to: target, velocity: v0, spring: s });
+    const resting = Math.abs(current.value - target) <= restDelta && Math.abs(current.velocity) <= restSpeed;
+    if (resting) {
+      current = { value: target, velocity: 0 };
+      done = true;
+      onUpdate(target, 0);
+      onComplete(target);
+      resolve(true);
+      return;
+    }
+    onUpdate(current.value, current.velocity);
+    frame = raf(tick);
+  };
+  frame = raf(tick);
+
+  const sync = () => {
+    if (!done) current = springAt((now() - t0) / 1000, { from: origin, to: target, velocity: v0, spring: s });
+    return current;
+  };
+
+  return {
+    finished,
+    get value() {
+      return sync().value;
+    },
+    get velocity() {
+      return sync().velocity;
+    },
+    get target() {
+      return target;
+    },
+    get done() {
+      return done;
+    },
+    /** Head somewhere else without losing momentum. */
+    retarget(newTo, { velocity: newVelocity, spring: newSpring } = {}) {
+      const live = sync();
+      origin = live.value;
+      v0 = newVelocity ?? live.velocity;
+      target = newTo;
+      t0 = now();
+      if (newSpring) s = newSpring;
+      if (done) {
+        done = false;
+        frame = raf(tick);
+      }
+      return this;
+    },
+    /** Freeze where it is. Hand the returned state to whatever takes over. */
+    stop() {
+      const live = sync();
+      if (!done) {
+        done = true;
+        caf(frame);
+        resolve(false);
+      }
+      return live;
+    },
+  };
+}
+
+/**
+ * Glide with momentum, then settle. If the glide would leave [min, max] it
+ * hands its remaining velocity to a spring pulling back to the edge, which is
+ * the bounce you feel at the end of a scroll.
+ */
+function decay({
+  from = 0,
+  velocity = 0,
+  decelerationRate = DECELERATION.normal,
+  min = -Infinity,
+  max = Infinity,
+  edgeSpring = SPRINGS.release,
+  onUpdate = () => {},
+  onComplete = () => {},
+  restSpeed = 4,
+} = {}) {
+  const t0 = now();
+  let current = { value: from, velocity };
+  let frame = 0;
+  let done = false;
+  let handoff = null;
+
+  const tick = () => {
+    if (done) return;
+    current = decayAt((now() - t0) / 1000, { from, velocity, decelerationRate });
+    const edge = current.value < min ? min : current.value > max ? max : null;
+    if (edge !== null) {
+      handoff = animate({ from: current.value, to: edge, velocity: current.velocity, spring: edgeSpring, onUpdate, onComplete });
+      return;
+    }
+    onUpdate(current.value, current.velocity);
+    if (Math.abs(current.velocity) < restSpeed) {
+      done = true;
+      onComplete(current.value);
+      return;
+    }
+    frame = raf(tick);
+  };
+  frame = raf(tick);
+
+  return {
+    get value() {
+      return handoff ? handoff.value : current.value;
+    },
+    get velocity() {
+      return handoff ? handoff.velocity : current.velocity;
+    },
+    stop() {
+      if (handoff) return handoff.stop();
+      done = true;
+      caf(frame);
+      return current;
+    },
+  };
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 7. draggable(): the two-phase gesture in one place
+ *
+ *   Finger down → the element IS the finger. No easing, no spring, 1:1.
+ *   Finger up   → physics finishes the thought, starting at release velocity.
+ *
+ * Handles: grab offset, catch-mid-flight, tap-vs-drag slop, pointer capture,
+ * second-finger protection, rubber-banding, momentum projection, snapping,
+ * and swallowing the click that would otherwise follow a drag.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {HTMLElement} el
+ * @param {object} o
+ * @param {'x'|'y'} [o.axis='y']
+ * @param {[number, number]|(() => [number, number])} [o.bounds]  resting range; outside it rubber-bands.
+ *        Pass a function when the range depends on layout, so it survives a resize.
+ * @param {number[]|(() => number[])|null} [o.snap]  rest only on these values
+ * @param {number} [o.initial=0]
+ * @param {number} [o.slop=4]                px of movement before a press becomes a drag
+ * @param {object} [o.spring]                spring used after release
+ * @param {HTMLElement} [o.handle=el]        element that receives the pointer
+ * @param {(value:number, state:{dragging:boolean, velocity:number})=>void} [o.onUpdate]
+ * @param {(e:{value:number, velocity:number, projected:number, target:number})=>number|void} [o.onRelease]
+ *        return a number to override where it settles
+ * @param {(target:number)=>void} [o.onSettle]
+ */
+function draggable(el, o = {}) {
+  const axis = o.axis ?? 'y';
+  const read = (v, fallback) => (typeof v === 'function' ? v() : v) ?? fallback;
+  const bounds = () => read(o.bounds, [-Infinity, Infinity]);
+  const handle = o.handle ?? el;
+  const slop = o.slop ?? 4;
+  const spring = o.spring ?? SPRINGS.release;
+  const render =
+    o.render ??
+    ((v) => {
+      el.style.transform = axis === 'y' ? `translate3d(0, ${v}px, 0)` : `translate3d(${v}px, 0, 0)`;
+    });
+  const tracker = new VelocityTracker();
+  const coord = (e) => (axis === 'y' ? e.clientY : e.clientX);
+  const dimension = () => {
+    const r = el.getBoundingClientRect();
+    return (axis === 'y' ? r.height : r.width) || 1;
+  };
+
+  let value = o.initial ?? 0;
+  let anim = null;
+  let pointerId = null;
+  let dragging = false;
+  let startPointer = 0;
+  let startValue = 0;
+  let suppressClick = false;
+
+  const emit = (v, state) => {
+    value = v;
+    render(v);
+    o.onUpdate?.(v, state);
+  };
+  emit(value, { dragging: false, velocity: 0 });
+
+  const animateTo = (target, { velocity = 0, spring: sp = spring } = {}) => {
+    anim?.stop();
+    anim = animate({
+      from: value,
+      to: target,
+      velocity,
+      spring: sp,
+      onUpdate: (v, vel) => emit(v, { dragging: false, velocity: vel }),
+      onComplete: (t) => o.onSettle?.(t),
+    });
+    return anim;
+  };
+
+  const onDown = (e) => {
+    if (pointerId !== null || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    pointerId = e.pointerId;
+    // Catch it mid-flight: whatever it was doing, it stops being told what to do.
+    if (anim && !anim.done) value = anim.stop().value;
+    dragging = false;
+    startPointer = coord(e);
+    startValue = value;
+    tracker.reset();
+    tracker.add(coord(e), e.timeStamp);
+  };
+
+  const onMove = (e) => {
+    if (e.pointerId !== pointerId) return;
+    const p = coord(e);
+    if (!dragging) {
+      if (Math.abs(p - startPointer) < slop) return;
+      dragging = true;
+      startPointer = p; // re-base so crossing the slop doesn't jump
+      startValue = value;
+      try {
+        handle.setPointerCapture(pointerId);
+      } catch {}
+      o.onStart?.();
+    }
+    tracker.add(p, e.timeStamp);
+    const raw = startValue + (p - startPointer);
+    const [min, max] = bounds();
+    emit(rubberbandClamp(raw, min, max, dimension()), { dragging: true, velocity: tracker.velocity(e.timeStamp) });
+  };
+
+  const onUp = (e) => {
+    if (e.pointerId !== pointerId) return;
+    pointerId = null;
+    if (!dragging) return;
+    dragging = false;
+    suppressClick = true;
+    setTimeout(() => (suppressClick = false), 0);
+    const velocity = tracker.velocity(e.timeStamp);
+    const projected = value + project(velocity);
+    const snap = read(o.snap, null);
+    const [min, max] = bounds();
+    let target = snap?.length ? nearest(snap, projected) : clamp(projected, min, max);
+    const override = o.onRelease?.({ value, velocity, projected, target });
+    if (typeof override === 'number') target = override;
+    animateTo(target, { velocity });
+  };
+
+  const onClick = (e) => {
+    if (!suppressClick) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  handle.style.touchAction = o.touchAction ?? (axis === 'y' ? 'pan-x' : 'pan-y');
+  handle.addEventListener('pointerdown', onDown);
+  handle.addEventListener('pointermove', onMove);
+  handle.addEventListener('pointerup', onUp);
+  handle.addEventListener('pointercancel', onUp);
+  handle.addEventListener('click', onClick, true);
+
+  return {
+    get value() {
+      return value;
+    },
+    get dragging() {
+      return dragging;
+    },
+    /** Move programmatically (a button press): no velocity, so no bounce. */
+    animateTo,
+    set(v) {
+      anim?.stop();
+      emit(v, { dragging: false, velocity: 0 });
+    },
+    destroy() {
+      anim?.stop();
+      handle.removeEventListener('pointerdown', onDown);
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      handle.removeEventListener('pointercancel', onUp);
+      handle.removeEventListener('click', onClick, true);
+    },
+  };
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 8. Deciding on intent, not position
+ *
+ * A gesture ends where the finger stopped; the person meant where it was
+ * going. Commit on the projection.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Where a slider/swipe would be a moment after release, as a 0–1 fraction of
+ * its track:  (distance + lookahead × speed) ÷ track
+ *
+ * Compare the result against a commit threshold. A slow, deliberate drag has
+ * to physically reach it; a confident flick gets there on momentum. Raise the
+ * threshold for consequential actions (≈0.85 for "power off"), lower it for
+ * harmless ones (≈0.5).
+ */
+function projectedProgress(distance, velocity, track, lookahead = 0.3) {
+  if (!(track > 0)) return 0;
+  return (distance + lookahead * velocity) / track;
+}
+
+/**
+ * A threshold that learns from hesitation. While `dwelling` is true it moves
+ * a fraction of the way toward `ceiling` on every update; otherwise it falls
+ * back toward `floor`. Use it when one gesture has two meanings separated by
+ * a pause (flick = go home, pause = show switcher): the longer someone
+ * lingers, the more clearly they mean the second, so the easier it gets.
+ */
+function adaptiveThreshold({ floor = 51, ceiling = 134, rate = 0.2 } = {}) {
+  let value = floor;
+  return {
+    get value() {
+      return value;
+    },
+    update(dwelling) {
+      value += ((dwelling ? ceiling : floor) - value) * rate;
+      return value;
+    },
+    reset() {
+      value = floor;
+    },
+  };
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 9. Calm readouts
+ *
+ * Raw measurements are noisy: they jitter, dip and recover. A number on
+ * screen that does the same reads as a broken product. Filter what is
+ * displayed so it moves in small, orderly steps, and (where the truth only
+ * goes one way) never backtracks.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {object} o
+ * @param {number} [o.maxChange=1]      largest step the displayed value may take
+ * @param {number} [o.intervalMs=1000]  at most one step per interval
+ * @param {'down'|'up'|null} [o.monotonic=null]  refuse to move the other way
+ * @returns {(raw:number, nowMs?:number)=>number} feed it raw values, show its output
+ */
+function displayFilter({ maxChange = 1, intervalMs = 1000, monotonic = null } = {}) {
+  let shown;
+  let lastStep = -Infinity;
+  return (raw, t = now()) => {
+    if (shown === undefined) {
+      shown = raw;
+      lastStep = t;
+      return shown;
+    }
+    if (t - lastStep < intervalMs) return shown;
+    let delta = clamp(raw - shown, -maxChange, maxChange);
+    if (monotonic === 'down' && delta > 0) delta = 0;
+    if (monotonic === 'up' && delta < 0) delta = 0;
+    if (delta !== 0) {
+      shown += delta;
+      lastStep = t;
+    }
+    return shown;
+  };
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 10. Idle motion that looks alive: jiggle
+ *
+ * One looping animation on every element looks like a machine, because
+ * everything moves in step. Life comes from three things:
+ *   1. several independent motions (x, y, tilt) on slightly different clocks,
+ *      so the combination takes many minutes to repeat;
+ *   2. a random starting point per element, so no two are ever in sync;
+ *   3. tilt divided by the element's size, so a big tile moves its edges
+ *      about as far as a small one instead of swinging wildly.
+ * ──────────────────────────────────────────────────────────────────────── */
+
+/** Half-periods in ms. Close to one another, deliberately not equal. */
+const JIGGLE = Object.freeze({ xMs: 134, yMs: 142, tiltMs: 128, shift: 0.4, tiltDeg: 1.72 });
+
+/**
+ * Start jiggling an element (edit mode, "something here can be rearranged").
+ * Runs on the compositor via the Web Animations API.
+ *
+ * @param {Element} el
+ * @param {object} [o]
+ * @param {number} [o.size=1]      size in grid units; tilt is divided by it
+ * @param {number} [o.amount=1]    overall intensity
+ * @returns {() => void} stop
+ */
+function jiggle(el, { size = 1, amount = 1 } = {}) {
+  if (typeof el?.animate !== 'function' || prefersReducedMotion()) return () => {};
+  const phase = () => -Math.random() * 1000; // negative delay = start mid-cycle
+  const base = { direction: 'alternate', iterations: Infinity, easing: 'ease-in-out', composite: 'add' };
+  const shift = JIGGLE.shift * amount;
+  const tilt = (JIGGLE.tiltDeg * amount) / Math.max(size, 1);
+  const running = [
+    el.animate({ translate: [`${-shift}px 0`, `${shift}px 0`] }, { ...base, duration: JIGGLE.xMs, delay: phase() }),
+    el.animate({ translate: [`0 ${-shift}px`, `0 ${shift}px`] }, { ...base, duration: JIGGLE.yMs, delay: phase() }),
+    el.animate({ rotate: [`${-tilt}deg`, `${tilt}deg`] }, { ...base, duration: JIGGLE.tiltMs, delay: phase() }),
+  ];
+  return () => running.forEach((a) => a.cancel());
+}
+
+return { springFromBounce, springFromPhysical, SPRINGS, springAt, settleTime, springToCSS, rubberband, rubberbandClamp, DECELERATION, project, decayAt, nearest, VelocityTracker, prefersReducedMotion, animate, decay, draggable, projectedProgress, adaptiveThreshold, displayFilter, JIGGLE, jiggle };
+})();
+      const Squircle = (() => {
+/**
+ * second-nature · squircle.js
+ *
+ * Continuous corners as SVG path data.
+ *
+ * A CSS `border-radius` corner is a straight line that suddenly becomes a
+ * circular arc: curvature jumps from 0 to 1/r at a single point. The eye reads
+ * that jump as a faint kink, which is why plain rounded rectangles look
+ * slightly "stamped out". A continuous corner eases curvature in and out, so
+ * the edge flows into the corner the way a machined object does.
+ *
+ * Two generators:
+ *   continuousCornerPath  – the iOS-style corner (arc in the middle, eased
+ *                           bézier shoulders). Use this to match Apple hardware
+ *                           and Figma's "corner smoothing".
+ *   superellipsePath      – a true superellipse corner. Matches CSS
+ *                           `corner-shape: superellipse(k)` exactly.
+ *
+ * Both return a string for <path d="…">, `clip-path: path("…")`, or a mask.
+ */
+
+const rad = (deg) => (deg * Math.PI) / 180;
+const fmt = (n) => +n.toFixed(3);
+
+/**
+ * iOS-style continuous corner.
+ *
+ * Construction follows the one Figma published in "Desperately seeking
+ * squircles" (and the MIT-licensed figma-squircle by Tien Pham): each corner is
+ * a circular arc covering 90°·(1 − smoothing), joined to the edges by cubic
+ * béziers that ramp curvature gradually.
+ *
+ * @param {number} width
+ * @param {number} height
+ * @param {number} radius     nominal corner radius, as you would give border-radius
+ * @param {number} smoothing  0 = plain rounded rect, 0.6 ≈ iOS, 1 = maximum
+ */
+function continuousCornerPath(width, height, radius, smoothing = 0.6) {
+  const budget = Math.min(width, height) / 2;
+  const r = Math.max(0, Math.min(radius, budget));
+  if (r === 0) return `M0 0H${fmt(width)}V${fmt(height)}H0Z`;
+
+  // The corner needs (1 + smoothing)·r of edge to ease into. Give it what fits.
+  let s = Math.max(0, Math.min(smoothing, 1));
+  s = Math.min(s, budget / r - 1);
+  const p = Math.min((1 + s) * r, budget);
+
+  const arcMeasure = 90 * (1 - s);
+  const arcLength = Math.sin(rad(arcMeasure / 2)) * r * Math.SQRT2;
+  const alpha = (90 - arcMeasure) / 2;
+  const p3p4 = r * Math.tan(rad(alpha / 2));
+  const beta = 45 * s;
+  const c = p3p4 * Math.cos(rad(beta));
+  const d = c * Math.tan(rad(beta));
+  const b = (p - arcLength - c - d) / 3;
+  const a = 2 * b;
+
+  const f = fmt;
+  const abc = a + b + c;
+  return [
+    `M${f(width - p)} 0`,
+    // top-right
+    `c${f(a)} 0 ${f(a + b)} 0 ${f(abc)} ${f(d)}`,
+    `a${f(r)} ${f(r)} 0 0 1 ${f(arcLength)} ${f(arcLength)}`,
+    `c${f(d)} ${f(c)} ${f(d)} ${f(b + c)} ${f(d)} ${f(abc)}`,
+    `L${f(width)} ${f(height - p)}`,
+    // bottom-right
+    `c0 ${f(a)} 0 ${f(a + b)} ${f(-d)} ${f(abc)}`,
+    `a${f(r)} ${f(r)} 0 0 1 ${f(-arcLength)} ${f(arcLength)}`,
+    `c${f(-c)} ${f(d)} ${f(-(b + c))} ${f(d)} ${f(-abc)} ${f(d)}`,
+    `L${f(p)} ${f(height)}`,
+    // bottom-left
+    `c${f(-a)} 0 ${f(-(a + b))} 0 ${f(-abc)} ${f(-d)}`,
+    `a${f(r)} ${f(r)} 0 0 1 ${f(-arcLength)} ${f(-arcLength)}`,
+    `c${f(-d)} ${f(-c)} ${f(-d)} ${f(-(b + c))} ${f(-d)} ${f(-abc)}`,
+    `L0 ${f(p)}`,
+    // top-left
+    `c0 ${f(-a)} 0 ${f(-(a + b))} ${f(d)} ${f(-abc)}`,
+    `a${f(r)} ${f(r)} 0 0 1 ${f(arcLength)} ${f(-arcLength)}`,
+    `c${f(c)} ${f(-d)} ${f(b + c)} ${f(-d)} ${f(abc)} ${f(-d)}`,
+    'Z',
+  ].join('');
+}
+
+/**
+ * Rectangle with superellipse corners:  |x/r|ⁿ + |y/r|ⁿ = 1
+ *
+ *   exponent 2  → circular arcs (plain border-radius)
+ *   exponent 4  → CSS `corner-shape: squircle`
+ *   exponent 2^k → CSS `corner-shape: superellipse(k)`
+ *
+ * Note that `radius` here is the size of the corner *box*. A squircle in the
+ * same box as a circle looks tighter, because it hugs the corner more closely.
+ * See `matchCircularRadius` to keep the perceived roundness.
+ */
+function superellipsePath(width, height, radius, { exponent = 4, segments = 24 } = {}) {
+  const r = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
+  if (r === 0) return `M0 0H${fmt(width)}V${fmt(height)}H0Z`;
+  const e = 2 / exponent;
+  const corner = (cx, cy, startDeg) => {
+    let out = '';
+    for (let i = 0; i <= segments; i++) {
+      const t = rad(startDeg + (90 * i) / segments);
+      const cos = Math.cos(t);
+      const sin = Math.sin(t);
+      const x = cx + r * Math.sign(cos) * Math.abs(cos) ** e;
+      const y = cy + r * Math.sign(sin) * Math.abs(sin) ** e;
+      out += `L${fmt(x)} ${fmt(y)}`;
+    }
+    return out;
+  };
+  return (
+    `M${fmt(r)} 0` +
+    corner(width - r, r, -90) +
+    corner(width - r, height - r, 0) +
+    corner(r, height - r, 90) +
+    corner(r, r, 180) +
+    'Z'
+  );
+}
+
+/**
+ * The corner-box size that makes a superellipse corner look as round as a
+ * circular one of `radius` (same distance from the corner point to the curve's
+ * apex). For a squircle this is ≈ 1.84 × radius.
+ */
+function matchCircularRadius(radius, exponent = 4) {
+  const circleInset = 1 - Math.SQRT1_2;
+  const superInset = 1 - 0.5 ** (1 / exponent);
+  return (radius * circleInset) / superInset;
+}
+
+/**
+ * Concentric corner radius: the radius a shape needs so that it sits evenly
+ * inside its container. inner = outer − gap, never below `minimum`.
+ */
+function concentricRadius(outerRadius, gap, minimum = 0) {
+  return Math.max(outerRadius - gap, minimum);
+}
+
+/**
+ * Keep an element clipped to a continuous corner as it resizes.
+ * clip-path also clips box-shadow and borders: put the shadow on a wrapper
+ * with `filter: drop-shadow(…)`, or draw the shape as an SVG background.
+ *
+ * @returns {() => void} call to stop observing
+ */
+function applySquircle(el, { radius = 20, smoothing = 0.6 } = {}) {
+  const update = () => {
+    const { width, height } = el.getBoundingClientRect();
+    if (width && height) el.style.clipPath = `path("${continuousCornerPath(width, height, radius, smoothing)}")`;
+  };
+  update();
+  if (typeof ResizeObserver === 'undefined') return () => {};
+  const observer = new ResizeObserver(update);
+  observer.observe(el);
+  return () => observer.disconnect();
+}
+
+return { continuousCornerPath, superellipsePath, matchCircularRadius, concentricRadius, applySquircle };
+})();
+      const Feedback = (() => {
+/**
+ * second-nature · feedback.js
+ *
+ * One vocabulary of feedback, three senses.
+ *
+ *   feedback.play('selection')   // a detent: picker tick, segment change
+ *   feedback.play('light')       // impact: a small thing lands
+ *   feedback.play('success')     // notification: a task finished well
+ *
+ * Haptics play where the platform exposes them (Vibration API: Android, some
+ * desktops). iOS Safari exposes none to the web, so there the same call falls
+ * back to sound if you have enabled it, and the visual response you built
+ * carries the rest. Sound is OFF by default: a web page that makes noise
+ * uninvited has broken trust before it has earned any.
+ *
+ * The names follow Apple's feedback generators so one design language maps
+ * across platforms:
+ *   selection                       → UISelectionFeedbackGenerator
+ *   light · medium · heavy · soft · rigid → UIImpactFeedbackGenerator
+ *   success · warning · error       → UINotificationFeedbackGenerator
+ */
+
+/** vibrate: ms or [on, off, on…]. tone: [frequency Hz, duration s, gain 0–1, delay s][] */
+const VOCABULARY = {
+  selection: { vibrate: 6, tones: [[1800, 0.012, 0.35, 0]] },
+  light: { vibrate: 10, tones: [[1250, 0.018, 0.45, 0]] },
+  medium: { vibrate: 16, tones: [[880, 0.026, 0.6, 0]] },
+  heavy: { vibrate: 28, tones: [[520, 0.04, 0.8, 0]] },
+  soft: { vibrate: 14, tones: [[620, 0.05, 0.4, 0]] },
+  rigid: { vibrate: 8, tones: [[2200, 0.01, 0.55, 0]] },
+  success: {
+    vibrate: [10, 70, 18],
+    tones: [
+      [880, 0.07, 0.5, 0],
+      [1320, 0.11, 0.5, 0.085],
+    ],
+  },
+  warning: {
+    vibrate: [16, 110, 16],
+    tones: [
+      [740, 0.08, 0.5, 0],
+      [740, 0.08, 0.5, 0.13],
+    ],
+  },
+  error: {
+    vibrate: [24, 60, 24, 60, 32],
+    tones: [
+      [520, 0.07, 0.6, 0],
+      [390, 0.14, 0.6, 0.09],
+    ],
+  },
+};
+
+function createFeedback(options = {}) {
+  const config = { haptics: true, sound: false, volume: 0.5, minIntervalMs: 28, ...options };
+  let ctx = null;
+  let lastAt = 0;
+
+  const audio = () => {
+    if (typeof window === 'undefined') return null;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!ctx) ctx = new AC({ latencyHint: 'interactive' });
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  };
+
+  const tone = (ac, [frequency, duration, gain, delay]) => {
+    const t = ac.currentTime + delay;
+    const osc = ac.createOscillator();
+    const amp = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(frequency, t);
+    // A click, not a beep: instant attack, exponential fall, slight pitch drop.
+    osc.frequency.exponentialRampToValueAtTime(frequency * 0.86, t + duration);
+    const peak = Math.max(0.0001, gain * config.volume * 0.12);
+    amp.gain.setValueAtTime(0.0001, t);
+    amp.gain.exponentialRampToValueAtTime(peak, t + 0.002);
+    amp.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.connect(amp).connect(ac.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.02);
+  };
+
+  return {
+    /** Names you can play. */
+    types: Object.keys(VOCABULARY),
+
+    configure(next) {
+      Object.assign(config, next);
+      return this;
+    },
+
+    get config() {
+      return { ...config };
+    },
+
+    /**
+     * Fire on the frame the visual change happens, from inside the user's
+     * gesture handler: late feedback reads as a different event.
+     */
+    play(type = 'light') {
+      const entry = VOCABULARY[type];
+      if (!entry) return false;
+
+      // Rapid ticks blur into a buzz; drop the ones nobody could tell apart.
+      const t = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      if (t - lastAt < config.minIntervalMs) return false;
+      lastAt = t;
+
+      let played = false;
+      // Browsers only allow vibration after the person has interacted with the page.
+      const active = typeof navigator !== 'undefined' && (navigator.userActivation ? navigator.userActivation.hasBeenActive : true);
+      if (config.haptics && active && typeof navigator.vibrate === 'function') {
+        try {
+          played = navigator.vibrate(entry.vibrate) || played;
+        } catch {}
+      }
+      if (config.sound) {
+        const ac = audio();
+        if (ac) {
+          for (const spec of entry.tones) tone(ac, spec);
+          played = true;
+        }
+      }
+      return played;
+    },
+  };
+}
+
+/** A shared instance for the common case. */
+const feedback = createFeedback();
+
+/**
+ * Controller rumble for games and TV interfaces (Gamepad API).
+ * `weak` is the high-frequency motor (texture, UI ticks), `strong` the
+ * low-frequency one (impacts). Keep UI rumble short and weak; save strong for
+ * things that would be heavy in the world.
+ */
+function rumble(gamepad, { durationMs = 30, weak = 0.4, strong = 0 } = {}) {
+  const actuator = gamepad?.vibrationActuator;
+  if (!actuator?.playEffect) return Promise.resolve(false);
+  return actuator
+    .playEffect('dual-rumble', { duration: durationMs, weakMagnitude: weak, strongMagnitude: strong })
+    .then(() => true)
+    .catch(() => false);
+}
+
+return { createFeedback, feedback, rumble };
+})();
+
+      const { animate, draggable, springFromBounce, rubberbandClamp, project, nearest, VelocityTracker, projectedProgress, displayFilter, jiggle, SPRINGS } = Physics;
+      const { continuousCornerPath, concentricRadius } = Squircle;
+      const fb = Feedback.createFeedback({ haptics: true, sound: false });
+      const $ = (s, root = document) => root.querySelector(s);
+      const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+
+      /* ── 1 · Throw: 2D drag = two independent 1D springs ────────────────── */
+      {
+        const stage = $('#stage');
+        const puck = $('#puck');
+        const PAD = 16;
+        const pos = { x: 0, y: 0 };
+        const anim = { x: null, y: null };
+        const track = { x: new VelocityTracker(), y: new VelocityTracker() };
+        let spring = springFromBounce(0.5, 0.15);
+        let grab = null;
+
+        const limits = () => ({ x: stage.clientWidth - puck.offsetWidth - PAD * 2, y: stage.clientHeight - puck.offsetHeight - PAD * 2 });
+        const place = () => (puck.style.transform = `translate3d(${pos.x + PAD}px, ${pos.y + PAD}px, 0)`);
+        const settle = (axis, to, velocity) => {
+          anim[axis]?.stop();
+          anim[axis] = animate({ from: pos[axis], to, velocity, spring, onUpdate: (v) => ((pos[axis] = v), place()) });
+        };
+        place();
+
+        puck.addEventListener('pointerdown', (e) => {
+          if (grab) return; // a second finger doesn't get to steal it
+          try {
+            puck.setPointerCapture(e.pointerId); // keep tracking when the pointer leaves the tile
+          } catch {}
+          for (const a of ['x', 'y']) if (anim[a] && !anim[a].done) pos[a] = anim[a].stop().value; // catch it mid-flight
+          grab = { id: e.pointerId, px: e.clientX, py: e.clientY, x: pos.x, y: pos.y };
+          track.x.reset();
+          track.y.reset();
+          puck.classList.add('held');
+          fb.play('light');
+        });
+        puck.addEventListener('pointermove', (e) => {
+          if (grab?.id !== e.pointerId) return;
+          const lim = limits();
+          pos.x = rubberbandClamp(grab.x + e.clientX - grab.px, 0, lim.x, stage.clientWidth);
+          pos.y = rubberbandClamp(grab.y + e.clientY - grab.py, 0, lim.y, stage.clientHeight);
+          track.x.add(e.clientX, e.timeStamp);
+          track.y.add(e.clientY, e.timeStamp);
+          place();
+        });
+        const release = (e) => {
+          if (grab?.id !== e.pointerId) return;
+          grab = null;
+          puck.classList.remove('held');
+          const lim = limits();
+          const vx = track.x.velocity(e.timeStamp);
+          const vy = track.y.velocity(e.timeStamp);
+          // Land where the throw was going, not where the finger happened to lift.
+          settle('x', nearest([0, lim.x], pos.x + project(vx)), vx);
+          settle('y', nearest([0, lim.y], pos.y + project(vy)), vy);
+        };
+        puck.addEventListener('pointerup', release);
+        puck.addEventListener('pointercancel', release);
+
+        const show = () => {
+          const s = spring;
+          $('#springOut').textContent = `duration ${s.duration}s · bounce ${s.bounce} · stiffness ${s.stiffness.toFixed(0)} · damping ${s.damping.toFixed(1)}`;
+        };
+        $('#springPick').addEventListener('change', (e) => {
+          spring = springFromBounce(0.5, Number(e.target.value));
+          show();
+          fb.play('selection');
+          const lim = limits();
+          settle('x', pos.x > lim.x / 2 ? 0 : lim.x, 0); // show the new feel straight away
+        });
+        show();
+        new ResizeObserver(() => {
+          if (grab) return;
+          const lim = limits();
+          pos.x = nearest([0, lim.x], pos.x);
+          pos.y = nearest([0, lim.y], pos.y);
+          place();
+        }).observe(stage);
+      }
+
+      /* ── 2 · Sheet: detents, rubber band, linked scrim ──────────────────── */
+      {
+        const sheet = $('#sheet');
+        const scrim = $('#scrim');
+        const out = $('#sheetOut');
+        const FULL = 56;
+        const HALF = 250;
+        const PEEK = 432;
+        let last = PEEK;
+        const d = draggable(sheet, {
+          axis: 'y',
+          bounds: [FULL, PEEK],
+          snap: [FULL, HALF, PEEK],
+          initial: PEEK,
+          onUpdate(v, { dragging }) {
+            // One source of truth: the scrim is exactly as dark as the sheet is open.
+            scrim.style.opacity = Math.max(0, Math.min(1, (PEEK - v) / (PEEK - FULL))) * 0.4;
+            const beyond = v < FULL ? FULL - v : v > PEEK ? v - PEEK : 0;
+            out.textContent = beyond > 0.5 ? `resisting · ${beyond.toFixed(0)}pt past the edge` : dragging ? 'following 1:1' : 'at rest';
+          },
+          onSettle(t) {
+            if (t !== last) fb.play('soft');
+            last = t;
+          },
+        });
+        // A tap on the grabber steps through the stops. No velocity, so no bounce.
+        $('.grabber', sheet).addEventListener('click', () => {
+          const next = d.value > HALF + 1 ? HALF : d.value > FULL + 1 ? FULL : PEEK;
+          d.animateTo(next, { spring: SPRINGS.smooth });
+        });
+      }
+
+      /* ── 3 · Slide to confirm: commit on the projection ─────────────────── */
+      {
+        const slide = $('#slide');
+        const knob = $('#knob');
+        const label = $('#slideLabel');
+        const fill = $('#slideFill');
+        const out = $('#slideOut');
+        const THRESHOLD = 0.85;
+        let committed = false;
+        const span = () => slide.clientWidth - knob.offsetWidth - 8;
+        const d = draggable(knob, {
+          axis: 'x',
+          bounds: () => [0, span()],
+          slop: 2,
+          onUpdate(v, { velocity, dragging }) {
+            const p = Math.max(0, v / span());
+            label.style.opacity = 1 - Math.min(1, p * 1.8);
+            fill.style.opacity = committed ? 0.9 : 0;
+            knob.setAttribute('aria-valuenow', Math.round(p * 100));
+            if (dragging) out.textContent = `at ${Math.round(p * 100)}% · projected ${Math.round(projectedProgress(v, velocity, span()) * 100)}%`;
+          },
+          onRelease({ value, velocity }) {
+            const projected = projectedProgress(value, velocity, span());
+            const commit = projected >= THRESHOLD;
+            out.textContent = `projected ${Math.round(projected * 100)}% → ${commit ? 'commit' : 'spring back'}`;
+            if (!commit) return 0;
+            committed = true;
+            slide.classList.add('done');
+            fb.play('success');
+            setTimeout(() => {
+              committed = false;
+              slide.classList.remove('done');
+              d.animateTo(0, { spring: SPRINGS.smooth });
+            }, 1500);
+            return span();
+          },
+        });
+        // The same control from the keyboard: there is no gesture to project, so just act.
+        knob.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowRight') return;
+          e.preventDefault();
+          if (committed) return;
+          committed = true;
+          slide.classList.add('done');
+          fb.play('success');
+          d.animateTo(span(), { spring: SPRINGS.smooth });
+          setTimeout(() => {
+            committed = false;
+            slide.classList.remove('done');
+            d.animateTo(0, { spring: SPRINGS.smooth });
+          }, 1500);
+        });
+      }
+
+      /* ── 4 · Corners ────────────────────────────────────────────────────── */
+      {
+        const shapes = $('#shapes');
+        const zoom = $('#zoom');
+        const input = $('#radius');
+        const SIZE = 112;
+        const draw = () => {
+          const r = Number(input.value);
+          const arc = continuousCornerPath(SIZE, SIZE, r, 0);
+          const smooth = continuousCornerPath(SIZE, SIZE, r, 0.6);
+          shapes.innerHTML = `
+            <path d="${arc}" transform="translate(4 4)" fill="var(--sn-label-4)"/>
+            <path d="${smooth}" transform="translate(144 4)" fill="var(--sn-accent)"/>`;
+          // Magnify the top-right corner so the difference is visible.
+          const view = Math.min(SIZE, r * 1.8);
+          const m = view * 0.08; // a little air around the corner
+          zoom.setAttribute('viewBox', `${SIZE - view} ${-m} ${view + m} ${view + m}`);
+          const w = (view / 120) * 1.15;
+          zoom.innerHTML = `
+            <path d="${smooth}" fill="none" stroke="var(--sn-accent)" stroke-width="${w}"/>
+            <path d="${arc}" fill="none" stroke="var(--sn-label)" stroke-width="${w}" stroke-dasharray="${w * 2.5} ${w * 2.5}"/>`;
+          $('#radiusOut').textContent = `radius ${r} · curve starts ${(r * 1.6).toFixed(0)}px from the corner, not ${r}`;
+        };
+        input.addEventListener('input', draw);
+        draw();
+      }
+
+      /* ── 5 · Concentric ─────────────────────────────────────────────────── */
+      {
+        const input = $('#gap');
+        const R = 40;
+        const draw = () => {
+          const p = Number(input.value);
+          for (const el of $$('#nest .outer')) el.style.setProperty('--p', `${p}px`);
+          $('#wrongOut').textContent = `Same radius: ${R} inside ${R}`;
+          $('#rightOut').textContent = `Concentric: ${R} − ${p} = ${concentricRadius(R, p, 4)}`;
+          $('#gapOut').textContent = `padding ${p}`;
+        };
+        input.addEventListener('input', draw);
+        draw();
+      }
+
+      /* ── 6 · Feedback wiring: on the way down, on the causal event ───────── */
+      {
+        for (const el of $$('[data-fb]')) el.addEventListener('pointerdown', () => fb.play(el.dataset.fb));
+        for (const el of $$('[data-fb-change]')) el.addEventListener('change', () => fb.play(el.dataset.fbChange));
+        $('#sound').addEventListener('change', (e) => {
+          fb.configure({ sound: e.target.checked });
+          fb.play('selection');
+        });
+        $('#haptics').addEventListener('change', (e) => {
+          fb.configure({ haptics: e.target.checked });
+          fb.play('selection');
+        });
+      }
+
+      /* ── 7 · Jiggle ─────────────────────────────────────────────────────── */
+      {
+        const grid = $('#icons');
+        const hues = [262, 95, 27, 200, 165, 320, 55, 232];
+        grid.innerHTML =
+          `<i class="wide" data-size="2" style="--c: oklch(0.3 0.02 262)"></i>` +
+          hues.map((h, i) => `<i data-size="1" style="--c: oklch(${0.62 + (i % 3) * 0.06} 0.17 ${h})"></i>`).join('');
+        let stop = [];
+        $('#jigglePick').addEventListener('change', (e) => {
+          stop.forEach((fn) => fn());
+          stop = [];
+          grid.classList.toggle('sync', e.target.value === 'sync');
+          if (e.target.value === 'organic') stop = $$('i', grid).map((el) => jiggle(el, { size: Number(el.dataset.size), amount: 1.25 }));
+          fb.play('selection');
+        });
+      }
+
+      /* ── 8 · Calm numbers ───────────────────────────────────────────────── */
+      {
+        const filter = () => displayFilter({ maxChange: 1, intervalMs: 700, monotonic: 'down' });
+        let shown = filter();
+        let level = 100;
+        setInterval(() => {
+          level -= 0.12;
+          if (level < 6) {
+            level = 100;
+            shown = filter();
+          }
+          const raw = Math.max(0, Math.min(100, level + (Math.random() - 0.5) * 5));
+          const calm = shown(raw);
+          $('#rawOut').textContent = `${raw.toFixed(1)}%`;
+          $('#rawBar').style.transform = `scaleX(${raw / 100})`;
+          $('#shownOut').textContent = `${Math.round(calm)}%`;
+          $('#shownBar').style.transform = `scaleX(${calm / 100})`;
+        }, 140);
+      }
+    </script>
+  </body>
+</html>

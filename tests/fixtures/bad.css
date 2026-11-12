@@ -1,0 +1,12 @@
+/* Every rule here is something the audit should catch. */
+html, body { user-select: none; }
+.shell { height: 100vh; }
+.card { transition: all 0.3s ease-in; }
+.card:hover { transform: scale(1.05); }
+.menu { transition: height 800ms linear; }
+.modal-enter { transform: scale(0); }
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+button:focus { outline: none; }
+input { font-size: 13px; }
+.title { font-weight: 200; }
+@font-face { font-family: "SF Pro"; src: url("/fonts/SF-Pro-Display.woff2"); }

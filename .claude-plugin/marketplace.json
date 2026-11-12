@@ -1,0 +1,12 @@
+{
+  "name": "second-nature",
+  "description": "The Second Nature interface-design skill",
+  "owner": { "name": "nirmalkcse" },
+  "plugins": [
+    {
+      "name": "second-nature",
+      "source": "./",
+      "description": "Design, build and review interfaces that feel like second nature, on any platform."
+    }
+  ]
+}

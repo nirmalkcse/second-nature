@@ -1,0 +1,245 @@
+/**
+ * second-nature · tokens.css
+ *
+ * One scale for each thing, used everywhere. Consistency is not a style: it is
+ * what lets a person learn an interface once.
+ *
+ * Every value here is a starting point. Keep the structure (one spacing scale,
+ * one radius scale, semantic colours, role-based motion); swap the values for
+ * the product's own brand. If the project already has tokens, map these names
+ * onto them instead of adding a second system.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* ── Space · 4pt base ───────────────────────────────────────────────────
+     Spacing carries meaning: closer means related. Use the small steps inside
+     a component, the large ones between groups, and let the jumps be obvious. */
+  --sn-space-1: 4px;
+  --sn-space-2: 8px;
+  --sn-space-3: 12px;
+  --sn-space-4: 16px;
+  --sn-space-5: 20px;
+  --sn-space-6: 24px;
+  --sn-space-8: 32px;
+  --sn-space-10: 40px;
+  --sn-space-12: 48px;
+  --sn-space-16: 64px;
+  --sn-space-20: 80px;
+  --sn-space-24: 96px;
+  --sn-space-32: 128px;
+
+  /* Page gutters and the measure for running text. */
+  --sn-gutter: clamp(16px, 5vw, 48px);
+  --sn-measure: 65ch;
+  --sn-content: 980px;
+  --sn-wide: 1240px;
+
+  /* Smallest thing a finger can reliably hit. Visual size may be smaller;
+     the hit area may not. */
+  --sn-hit: 44px;
+
+  /* ── Shape ──────────────────────────────────────────────────────────────
+     Three kinds of corner: fixed (these), capsule (--sn-radius-full), and
+     concentric: inner = outer − gap. Never the same radius on a parent and
+     the child it pads. */
+  --sn-radius-xs: 6px;
+  --sn-radius-sm: 10px;
+  --sn-radius-md: 14px;
+  --sn-radius-lg: 20px;
+  --sn-radius-xl: 28px;
+  --sn-radius-2xl: 38px;
+  --sn-radius-full: 9999px;
+
+  /* Continuous corners where the browser can draw them (see @supports below).
+     Elsewhere these resolve to an ordinary circular corner of the same size. */
+  --sn-corner-shape: round;
+  --sn-corner-scale: 1;
+
+  /* ── Type ───────────────────────────────────────────────────────────────
+     The system font is the one the person already reads all day, tuned for
+     their screen. Reach past it only with a reason. */
+  --sn-font: system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --sn-font-display: system-ui, -apple-system, 'Segoe UI Variable Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --sn-font-rounded: ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --sn-font-serif: ui-serif, 'New York', 'Iowan Old Style', Georgia, serif;
+  --sn-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  /* Size / line-height / tracking travel together. Bigger text: tighter
+     leading, tighter tracking. Smaller text: the opposite. */
+  --sn-text-caption: 0.75rem;
+  --sn-text-footnote: 0.8125rem;
+  --sn-text-subhead: 0.9375rem;
+  --sn-text-body: 1.0625rem;
+  --sn-text-title-3: 1.25rem;
+  --sn-text-title-2: 1.375rem;
+  --sn-text-title-1: 1.75rem;
+  --sn-text-large-title: 2.125rem;
+  --sn-text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --sn-text-hero: clamp(3rem, 1.2rem + 7.2vw, 6.5rem);
+
+  --sn-leading-tight: 1.07;
+  --sn-leading-snug: 1.2;
+  --sn-leading-body: 1.47;
+
+  --sn-tracking-caption: 0.01em;
+  --sn-tracking-body: 0;
+  --sn-tracking-title: -0.01em;
+  --sn-tracking-display: -0.022em;
+
+  /* ── Colour · semantic, never literal ───────────────────────────────────
+     Name colours for what they mean. A component asks for "label", not
+     "#1d1d1f", so light, dark and high-contrast all come for free. */
+  --sn-bg: light-dark(#ffffff, #000000);
+  --sn-bg-2: light-dark(#f4f4f6, #151517);
+  --sn-bg-3: light-dark(#ffffff, #222225);
+
+  --sn-label: light-dark(rgb(0 0 0 / 0.88), rgb(255 255 255 / 0.93));
+  --sn-label-2: light-dark(rgb(0 0 0 / 0.6), rgb(255 255 255 / 0.64));
+  --sn-label-3: light-dark(rgb(0 0 0 / 0.45), rgb(255 255 255 / 0.46));
+  --sn-label-4: light-dark(rgb(0 0 0 / 0.2), rgb(255 255 255 / 0.22));
+
+  --sn-fill-1: light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.15));
+  --sn-fill-2: light-dark(rgb(0 0 0 / 0.05), rgb(255 255 255 / 0.1));
+  --sn-fill-3: light-dark(rgb(0 0 0 / 0.03), rgb(255 255 255 / 0.06));
+
+  --sn-separator: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.14));
+
+  /* One accent. It means "you can act here" and nothing else. */
+  --sn-accent: light-dark(oklch(0.55 0.2 257), oklch(0.7 0.16 255));
+  --sn-on-accent: #ffffff;
+  --sn-accent-soft: color-mix(in oklch, var(--sn-accent) 14%, transparent);
+
+  --sn-success: light-dark(oklch(0.6 0.16 150), oklch(0.76 0.19 150));
+  --sn-warning: light-dark(oklch(0.68 0.16 65), oklch(0.8 0.15 75));
+  --sn-danger: light-dark(oklch(0.58 0.22 27), oklch(0.7 0.19 25));
+
+  /* ── Depth ──────────────────────────────────────────────────────────────
+     Shadows come in layers: a tight one for contact, a wide one for ambient
+     light. Higher things cast softer, larger shadows. */
+  --sn-shadow-1: 0 1px 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 1px 3px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
+  --sn-shadow-2: 0 1px 2px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 6px 16px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.45));
+  --sn-shadow-3: 0 2px 6px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3)), 0 16px 40px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.55));
+  --sn-shadow-4: 0 4px 12px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.35)), 0 32px 80px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.65));
+
+  /* In the dark, shadows barely show: an edge of light does the lifting. */
+  --sn-edge: inset 0 0 0 0.5px light-dark(rgb(0 0 0 / 0.06), rgb(255 255 255 / 0.12));
+  --sn-edge-top: inset 0 1px 0 light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.1));
+
+  /* Materials: translucent layers for chrome that floats over content. */
+  --sn-material-thin: light-dark(rgb(255 255 255 / 0.55), rgb(40 40 44 / 0.5));
+  --sn-material: light-dark(rgb(255 255 255 / 0.72), rgb(32 32 36 / 0.7));
+  --sn-material-thick: light-dark(rgb(255 255 255 / 0.86), rgb(28 28 31 / 0.86));
+  --sn-material-filter: blur(24px) saturate(180%);
+  --sn-scrim: light-dark(rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.56));
+
+  --sn-focus-ring: 0 0 0 4px color-mix(in oklch, var(--sn-accent) 38%, transparent);
+
+  --sn-z-raised: 1;
+  --sn-z-sticky: 100;
+  --sn-z-overlay: 1000;
+  --sn-z-modal: 1100;
+  --sn-z-toast: 1200;
+
+  /* ── Motion ─────────────────────────────────────────────────────────────
+     Role-based. Pick by what is happening, not by how it looks:
+       press / hover feedback       → instant, fast
+       menus, popovers, tabs        → swift spring
+       sheets, pages, big surfaces  → smooth spring
+       anything a gesture released  → JS spring with the gesture's velocity
+     Entering things decelerate (ease-out). Nothing in an interface should
+     ever start slowly, so there is no ease-in token. */
+  --sn-dur-instant: 100ms;
+  --sn-dur-fast: 160ms;
+  --sn-dur-base: 240ms;
+  --sn-dur-slow: 360ms;
+  --sn-dur-slower: 500ms;
+
+  --sn-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sn-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --sn-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Springs baked into linear() so they run off the main thread.
+     Regenerate with: node scripts/spring.mjs --tokens */
+  --sn-spring-micro: linear(0, 0.0281 2.78%, 0.0952 5.56%, 0.1821 8.33%, 0.3699 13.89%, 0.4584 16.67%, 0.5393 19.44%, 0.6114 22.22%, 0.6745 25%, 0.729 27.78%, 0.7756 30.56%, 0.815 33.33%, 0.8481 36.11%, 0.8986 41.67%, 0.9331 47.22%, 0.9563 52.78%, 0.9716 58.33%, 0.9906 72.22%, 1);
+  --sn-spring-micro-duration: 296ms;
+  --sn-spring-swift: linear(0, 0.0136 1.89%, 0.0484 3.77%, 0.0974 5.66%, 0.1552 7.55%, 0.3452 13.21%, 0.4656 16.98%, 0.5719 20.75%, 0.6189 22.64%, 0.7009 26.42%, 0.7676 30.19%, 0.821 33.96%, 0.8631 37.74%, 0.8959 41.51%, 0.9317 47.17%, 0.9556 52.83%, 0.9713 58.49%, 0.9842 66.04%, 0.9914 73.58%, 1);
+  --sn-spring-swift-duration: 442ms;
+  --sn-spring-smooth: linear(0, 0.0051 1.12%, 0.0189 2.25%, 0.0397 3.37%, 0.0965 5.62%, 0.1659 7.87%, 0.3552 13.48%, 0.4627 16.85%, 0.5589 20.22%, 0.6422 23.6%, 0.7125 26.97%, 0.7709 30.34%, 0.8186 33.71%, 0.8572 37.08%, 0.897 41.57%, 0.9263 46.07%, 0.9519 51.69%, 0.9715 58.43%, 0.9832 65.17%, 0.9918 74.16%, 1);
+  --sn-spring-smooth-duration: 737ms;
+  --sn-spring-snappy: linear(0, 0.0052 1.19%, 0.0195 2.38%, 0.0413 3.57%, 0.1018 5.95%, 0.1773 8.33%, 0.4297 15.48%, 0.5094 17.86%, 0.6177 21.43%, 0.6812 23.81%, 0.7374 26.19%, 0.8083 29.76%, 0.8644 33.33%, 0.9076 36.9%, 0.9399 40.48%, 0.9696 45.24%, 0.988 50%, 0.9984 54.76%, 1.0063 66.67%, 1);
+  --sn-spring-snappy-duration: 700ms;
+  --sn-spring-bouncy: linear(0, 0.0052 1.01%, 0.0197 2.02%, 0.0421 3.03%, 0.0712 4.04%, 0.1056 5.05%, 0.1445 6.06%, 0.2313 8.08%, 0.4674 13.13%, 0.6011 16.16%, 0.7187 19.19%, 0.7863 21.21%, 0.8448 23.23%, 0.9159 26.26%, 0.9684 29.29%, 1.0047 32.32%, 1.0214 34.34%, 1.0373 37.37%, 1.046 42.42%, 1.0415 47.47%, 1.0133 61.62%, 1.0023 70.71%, 0.998 82.83%, 1);
+  --sn-spring-bouncy-duration: 821ms;
+  --sn-spring-release: linear(0, 0.008 1.54%, 0.0298 3.08%, 0.0624 4.62%, 0.1034 6.15%, 0.2017 9.23%, 0.421 15.38%, 0.5257 18.46%, 0.621 21.54%, 0.7048 24.62%, 0.7763 27.69%, 0.8358 30.77%, 0.8841 33.85%, 0.9381 38.46%, 0.9637 41.54%, 0.9898 46.15%, 1.0049 50.77%, 1.0124 55.38%, 1.0147 64.62%, 1);
+  --sn-spring-release-duration: 542ms;
+
+  /* Multiply distances by this. Under reduced motion it becomes 0: things
+     still fade, they just stop travelling. */
+  --sn-motion: 1;
+}
+
+/* An explicit theme switch wins over the OS setting. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* Continuous corners: fitted so the corner reads as round as the circular one
+   it replaces (max deviation ≈ 1% of the radius from an iOS-style corner). */
+@supports (corner-shape: superellipse(1.8)) {
+  :root {
+    --sn-corner-shape: superellipse(1.8);
+    --sn-corner-scale: 1.6;
+  }
+}
+
+/* Reduced motion is not "no feedback". Keep colour and opacity changes, drop
+   travel and overshoot, and shorten what remains. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sn-motion: 0;
+    --sn-dur-base: 160ms;
+    --sn-dur-slow: 200ms;
+    --sn-dur-slower: 200ms;
+    --sn-spring-micro: ease-out;
+    --sn-spring-micro-duration: 120ms;
+    --sn-spring-swift: ease-out;
+    --sn-spring-swift-duration: 160ms;
+    --sn-spring-smooth: ease-out;
+    --sn-spring-smooth-duration: 200ms;
+    --sn-spring-snappy: ease-out;
+    --sn-spring-snappy-duration: 200ms;
+    --sn-spring-bouncy: ease-out;
+    --sn-spring-bouncy-duration: 200ms;
+    --sn-spring-release: ease-out;
+    --sn-spring-release-duration: 200ms;
+  }
+}
+
+/* People who ask for less transparency get solid surfaces. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --sn-material-thin: var(--sn-bg-2);
+    --sn-material: var(--sn-bg-2);
+    --sn-material-thick: var(--sn-bg-2);
+    --sn-material-filter: none;
+  }
+}
+
+/* People who ask for more contrast get firmer text, edges and separators. */
+@media (prefers-contrast: more) {
+  :root {
+    --sn-label-2: light-dark(rgb(0 0 0 / 0.8), rgb(255 255 255 / 0.86));
+    --sn-label-3: light-dark(rgb(0 0 0 / 0.68), rgb(255 255 255 / 0.72));
+    --sn-separator: light-dark(rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.5));
+    --sn-edge: inset 0 0 0 1px light-dark(rgb(0 0 0 / 0.5), rgb(255 255 255 / 0.6));
+    --sn-material-thin: var(--sn-bg);
+    --sn-material: var(--sn-bg);
+    --sn-material-thick: var(--sn-bg);
+    --sn-material-filter: none;
+  }
+}
