@@ -4,3 +4,5 @@ Thumbs.db
 *.log
 .claude/
 *-workspace/
+benchmark/review.html
+.playwright-mcp/

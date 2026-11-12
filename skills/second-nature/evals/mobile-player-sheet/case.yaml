@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: mobile-player-sheet
+expected_outcome: |
+  A single index.html with a mini-player that expands into a full player sheet. Dragging tracks the finger 1:1, the release uses the gesture's velocity to decide where it lands, it can be grabbed again mid-animation, it resists rather than stops at its limits, and it also opens and closes by tap and keyboard. Mobile web foundations are in place (safe areas, no tap flash, no page scroll hijack, reduced motion).

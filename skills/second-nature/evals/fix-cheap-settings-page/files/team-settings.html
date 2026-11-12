@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Team settings</title>
+<style>
+  * { box-sizing: border-box; outline: none; }
+  body { margin: 0; font-family: Arial, sans-serif; font-size: 14px; background: #eef1f6; color: #222; user-select: none; }
+  .app { display: flex; height: 100vh; }
+  .sidebar { width: 220px; background: #1f2a44; color: #fff; padding: 20px; border-right: 3px solid #0d1526; }
+  .sidebar h2 { font-size: 18px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
+  .nav-item { padding: 10px 12px; border-radius: 16px; margin-bottom: 6px; cursor: pointer; transition: all 0.4s ease-in; border: 1px solid #33415f; }
+  .nav-item:hover { background: #ff5a5f; transform: scale(1.06); }
+  .nav-item.active { background: #7b61ff; }
+  .main { flex: 1; overflow: auto; padding: 24px; }
+  h1 { font-size: 30px; font-weight: 300; letter-spacing: 1px; margin: 0 0 6px; }
+  .sub { color: #999; margin-bottom: 20px; }
+  .card { background: #fff; border: 2px solid #cfd6e4; border-radius: 16px; padding: 12px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); transition: all 0.5s ease-in; }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.45); }
+  .card h3 { margin: 4px 4px 12px; font-size: 16px; color: #00a3a3; border-bottom: 2px solid #cfd6e4; padding-bottom: 10px; }
+  .member { display: flex; align-items: center; padding: 10px; border: 1px solid #cfd6e4; border-radius: 16px; margin-bottom: 8px; background: #f7f9fc; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: #ffb400; color: #fff; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold; }
+  .member .name { flex: 1; }
+  .member .email { color: #aaa; font-size: 11px; }
+  .role { position: relative; }
+  .role-btn { padding: 4px 8px; border: 1px solid #7b61ff; border-radius: 16px; color: #7b61ff; cursor: pointer; font-size: 12px; }
+  .menu { position: absolute; right: 0; top: 28px; width: 150px; background: #fff; border: 2px solid #cfd6e4; border-radius: 16px; overflow: hidden; height: 0; opacity: 0; transition: height 0.5s ease-in, opacity 0.5s ease-in; z-index: 5; }
+  .menu.open { height: 108px; opacity: 1; }
+  .menu div { padding: 9px 12px; cursor: pointer; font-size: 12px; }
+  .menu div:hover { background: #ffb400; color: #fff; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #cfd6e4; }
+  .toggle { width: 36px; height: 18px; border-radius: 9px; background: #ccc; position: relative; cursor: pointer; transition: all 0.6s linear; }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: left 0.6s linear; }
+  .toggle.on { background: #00a3a3; }
+  .toggle.on::after { left: 20px; }
+  .btn { display: inline-block; padding: 8px 14px; border-radius: 16px; background: #7b61ff; color: #fff; cursor: pointer; font-size: 13px; transition: all 0.4s ease-in; }
+  .btn:hover { background: #ff5a5f; transform: scale(1.08); }
+  .btn.danger { background: #e02424; }
+  .btn.ghost { background: transparent; color: #7b61ff; border: 1px solid #7b61ff; }
+  input[type=text], input[type=email], select { width: 100%; padding: 7px 9px; font-size: 13px; border: 2px solid #cfd6e4; border-radius: 16px; margin-bottom: 10px; }
+  .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .overlay.show { display: flex; }
+  .modal { width: 340px; background: #fff; border-radius: 16px; padding: 12px; border: 2px solid #7b61ff; animation: pop 0.6s ease-in; }
+  .modal .inner { border: 1px solid #cfd6e4; border-radius: 16px; padding: 14px; }
+  @keyframes pop { from { transform: scale(0) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+  .spinner { display: none; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 2s ease-in infinite; margin-left: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .saved { color: #00a3a3; margin-left: 10px; opacity: 0; transition: all 1s ease-in; }
+  .saved.show { opacity: 1; }
+  .count { color: #ff5a5f; font-weight: bold; }
+  @media (max-width: 700px) { .sidebar { display: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <h2>Acme</h2>
+    <div class="nav-item">General</div>
+    <div class="nav-item active">Team</div>
+    <div class="nav-item">Billing</div>
+    <div class="nav-item">Security</div>
+  </div>
+  <div class="main">
+    <h1>Team settings</h1>
+    <div class="sub">Manage who has access. <span class="count" id="count"></span></div>
+
+    <div class="card">
+      <h3>Members</h3>
+      <div id="members"></div>
+      <div class="btn" onclick="openInvite()">+ Invite</div>
+    </div>
+
+    <div class="card">
+      <h3>Notifications</h3>
+      <div class="row">Email me when someone joins <div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row">Weekly activity digest <div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+      <div class="row">Mentions <div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div style="margin-top:12px">
+        <div class="btn" onclick="save()">Save changes<span class="spinner" id="spin"></span></div>
+        <span class="saved" id="saved">Saved!</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="color:#e02424">Danger zone</h3>
+      <div class="row">Delete this workspace and all of its data <div class="btn danger" onclick="if(confirm('Are you sure?')) alert('Deleted')">Delete</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="inner">
+      <h3 style="margin-top:0">Invite a teammate</h3>
+      <input type="text" placeholder="Name" id="inviteName">
+      <input type="email" placeholder="Email" id="inviteEmail">
+      <select id="inviteRole"><option>Member</option><option>Admin</option><option>Viewer</option></select>
+      <div class="btn" onclick="invite()">Send invite</div>
+      <div class="btn ghost" onclick="closeInvite()">Cancel</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var members = [
+    { name: 'Priya Raman', email: 'priya@acme.test', role: 'Admin' },
+    { name: 'Tomás Alvarenga-Whitfield', email: 'tomas.alvarenga-whitfield@acme.test', role: 'Member' },
+    { name: 'Jun Sato', email: 'jun@acme.test', role: 'Viewer' }
+  ];
+  function render() {
+    var html = '';
+    for (var i = 0; i < members.length; i++) {
+      var m = members[i];
+      html += '<div class="member"><div class="avatar">' + m.name[0] + '</div><div class="name">' + m.name + '<div class="email">' + m.email + '</div></div>' +
+        '<div class="role"><div class="role-btn" onclick="toggleMenu(' + i + ')">' + m.role + ' ▾</div>' +
+        '<div class="menu" id="menu' + i + '"><div onclick="setRole(' + i + ',\'Admin\')">Admin</div><div onclick="setRole(' + i + ',\'Member\')">Member</div><div onclick="setRole(' + i + ',\'Viewer\')">Viewer</div></div></div></div>';
+    }
+    document.getElementById('members').innerHTML = html;
+    document.getElementById('count').innerHTML = members.length + ' members';
+  }
+  function toggleMenu(i) { document.getElementById('menu' + i).classList.toggle('open'); }
+  function setRole(i, r) { members[i].role = r; render(); }
+  function openInvite() { document.getElementById('overlay').classList.add('show'); }
+  function closeInvite() { document.getElementById('overlay').classList.remove('show'); }
+  function invite() {
+    var n = document.getElementById('inviteName').value, e = document.getElementById('inviteEmail').value;
+    if (!n || !e) { alert('Please fill in all fields'); return; }
+    members.push({ name: n, email: e, role: document.getElementById('inviteRole').value });
+    closeInvite(); render();
+  }
+  function save() {
+    document.getElementById('spin').style.display = 'inline-block';
+    setTimeout(function () {
+      document.getElementById('spin').style.display = 'none';
+      document.getElementById('saved').classList.add('show');
+      setTimeout(function () { document.getElementById('saved').classList.remove('show'); }, 2000);
+    }, 1500);
+  }
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: premium-landing-page
+expected_outcome: |
+  A single self-contained index.html landing page with a hero, three steps, three plans with a working monthly/annual switch, an FAQ accordion and an email signup. It reads as restrained and premium (one accent, generous space, strong type), fits a phone screen without sideways scrolling, responds to presses immediately, is usable by keyboard, keeps text legible, and handles reduced motion.

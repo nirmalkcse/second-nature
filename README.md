@@ -94,9 +94,10 @@ skills/second-nature/
 │   ├── squircle.js             Continuous-corner and superellipse paths
 │   ├── feedback.js             Haptics, synthesised sound, gamepad rumble
 │   └── SecondNature.swift      The same vocabulary for SwiftUI
-└── scripts/
-    ├── spring.mjs              One spring in every platform's dialect
-    └── audit.mjs               Finds the tells a machine can find
+├── scripts/
+│   ├── spring.mjs              One spring in every platform's dialect
+│   └── audit.mjs               Finds the tells a machine can find
+└── evals/                      Three test tasks with 52 checks, for benchmarking the skill
 ```
 
 ### The two scripts
@@ -124,6 +125,7 @@ Both are plain Node with no dependencies.
 - `physics.js`: 17 tests, including Apple's documented spring values, agreement between the closed-form solver and brute-force integration, and the published rubber-band figures. Run `npm test`.
 - `audit.mjs`: 6 tests against deliberately bad and deliberately good samples; the skill's own assets and demo pass it.
 - The demo: the drag, throw, catch-mid-flight, rubber-band, snap and commit-on-projection logic was exercised in a browser with simulated pointer input, and the layout checked at desktop and phone widths in light and dark. It has not been felt on a physical phone.
+- A with-and-without benchmark on three web tasks (Claude Fable 5.2, one run each): both versions passed all 52 checks, so the skill did not raise the pass rate. With it, every result gained a designed dark mode, contrast handling, continuous corners and a token system, at about 1.8 times the tokens. Details and comparison images: [`benchmark/RESULTS.md`](benchmark/RESULTS.md).
 - `SecondNature.swift`: written against the public SwiftUI API but **not compiled** in this repository. Build it in your project before relying on it.
 - Feel on real hardware, haptics, and 120 Hz behaviour cannot be verified from a repository. The skill tells agents to say so.
 

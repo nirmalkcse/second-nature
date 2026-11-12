@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: fix-cheap-settings-page
+expected_outcome: |
+  team-settings.html keeps every feature (member list with role menus, notification toggles, invite dialog, save, delete workspace) but no longer has the problems that made it feel cheap. Zoom is re-enabled, controls are real buttons with pressed and focus states, motion uses transform and opacity with decelerating curves, hover does not stick on touch, the layout no longer depends on 100vh, inputs do not zoom the page, text is legible, reduced motion is respected, and the dialog works from the keyboard. A short summary explains the changes and why.
+context:
+  scaffold_script: place-files.sh
