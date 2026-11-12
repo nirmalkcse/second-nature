@@ -19,24 +19,43 @@ It distils how Apple's platforms earn that feeling (the Human Interface Guidelin
 
 **You cannot feel what you build.** You can verify structure, maths and performance from code; you cannot verify feel. Run it when you can, record it and step through frame by frame when you can, and tell the person plainly which parts need their hands on a real device.
 
+## What to read
+
+**This file is the working set.** It holds the decision rules, the numbers, the floor and the tells, and for most tasks it is all you need. The other files are depth, for when a task turns on one topic or you are stuck on a specific question.
+
+Reading everything is the expensive mistake. In testing, agents that opened a dozen reference files to build a single page spent nearly twice the tokens of agents working with no skill at all, and passed exactly the same checks. Choose by the task:
+
+| The task | Read beyond this file |
+| --- | --- |
+| A tweak, a fix, one component, a question | Nothing |
+| Repairing or reviewing existing UI | Nothing. Run `scripts/audit.mjs` and work from the tells below |
+| A page or a screen | Nothing, unless the stack's conventions are unfamiliar (then its platform guide) |
+| Something dragged, swiped, flicked or snapped | [gestures.md](references/gestures.md) |
+| A design system, a new product, a visual language | Up to three references from the table below |
+
+- **Open a file to answer a question you can state** ("how should a sheet decide where to land?"), never to be thorough.
+- **Three is the ceiling.** About to open a fourth? Build instead, and come back only for something specific.
+- **Do not read `assets/` to learn the rules.** The rules are here. Open an asset when you are about to copy from it; the summary under *What ships with this skill* is enough to call the JavaScript.
+- **Read in part.** Every reference opens with a contents list. Go to the section that answers your question.
+
 ## The eight pillars
 
-Each is a question to ask of the work. Read the reference when the task leans on that pillar.
+Each is a question to ask of the work. The file beside it is depth; open it only for the reason given.
 
-| # | Pillar | The question | Read |
+| # | Pillar | The question | Depth, and when it is worth opening |
 | --- | --- | --- | --- |
-| 1 | **Simplicity** | What here does the person not need right now? | [simplicity.md](references/simplicity.md) |
-| 2 | **Physics** | Does it move the way a real object would if I did that to it? | [motion.md](references/motion.md), [gestures.md](references/gestures.md) |
-| 3 | **Geometry** | Are the shapes, spacing and alignment decided by a system, or by accident? | [geometry.md](references/geometry.md) |
-| 4 | **Feedback** | Does every action get an immediate, proportionate answer? | [feedback.md](references/feedback.md) |
-| 5 | **Consistency** | Does the same thing look and behave the same everywhere? | [consistency.md](references/consistency.md) |
-| 6 | **Cognition** | How much does the person have to remember, decide or decode? | [cognition.md](references/cognition.md) |
-| 7 | **Details** | Would the smallest part of this survive being looked at closely? | [details.md](references/details.md) |
-| 8 | **Performance** | Is there any moment where the person waits and nothing tells them why? | [performance.md](references/performance.md) |
+| 1 | **Simplicity** | What here does the person not need right now? | [simplicity.md](references/simplicity.md): a screen with too much on it, a dense tool or dashboard |
+| 2 | **Physics** | Does it move the way a real object would if I did that to it? | [gestures.md](references/gestures.md): anything dragged or swiped. [motion.md](references/motion.md): tuning springs past the defaults here, or choreographing several moving parts |
+| 3 | **Geometry** | Are the shapes, spacing and alignment decided by a system, or by accident? | [geometry.md](references/geometry.md): drawing continuous corners on a specific platform, or setting up a shape and spacing system |
+| 4 | **Feedback** | Does every action get an immediate, proportionate answer? | [feedback.md](references/feedback.md): haptics or sound, loading and progress, a custom control's full set of states |
+| 5 | **Consistency** | Does the same thing look and behave the same everywhere? | [consistency.md](references/consistency.md): creating or extending a token system; one product on several platforms |
+| 6 | **Cognition** | How much does the person have to remember, decide or decode? | [cognition.md](references/cognition.md): navigation and information architecture, long forms, many screen sizes |
+| 7 | **Details** | Would the smallest part of this survive being looked at closely? | [details.md](references/details.md): a final polish pass on something that matters |
+| 8 | **Performance** | Is there any moment where the person waits and nothing tells them why? | [performance.md](references/performance.md): something is janky or slow |
 
-Supporting references: [typography-color.md](references/typography-color.md) · [materials-depth.md](references/materials-depth.md) · [review.md](references/review.md) · [apple-lineage.md](references/apple-lineage.md) (design eras, OS versions, the source talks).
+Also: [typography-color.md](references/typography-color.md) (setting up a type scale or palette) · [materials-depth.md](references/materials-depth.md) (translucent chrome, glass, shadow) · [review.md](references/review.md) (a formal written review) · [apple-lineage.md](references/apple-lineage.md) (history, OS versions and sources, only when asked).
 
-Platform guides: [web](references/platforms/web.md) · [Apple native](references/platforms/apple.md) · [React Native, Flutter, Android, desktop](references/platforms/cross-platform.md) · [games, consoles, TV and OS shells](references/platforms/games-consoles-os.md).
+Platform guides, for conventions you are unsure of: [web](references/platforms/web.md) · [Apple native](references/platforms/apple.md) · [React Native, Flutter, Android, desktop](references/platforms/cross-platform.md) · [games, consoles, TV and OS shells](references/platforms/games-consoles-os.md).
 
 ## The loop
 
@@ -50,6 +69,31 @@ Work through these in order for anything larger than a tweak. Each step removes 
 6. **Answer.** Give every interactive element all of its states (rest, hover, focus, pressed, busy, done, failed, disabled). Respond on the way down, within 100 ms. Add sound and haptics only where a physical thing would make them.
 7. **Finish.** The details pass: empty, loading and error states, long and short content, dark mode, large text, reduced motion, keyboard, right-to-left, the corners and the hairlines.
 8. **Verify.** Run it. Check it at the smallest and largest sizes and on the slowest device you can. Run `scripts/audit.mjs` over the code. Report what you verified and what needs a human hand.
+
+## The floor
+
+What every interface gets, whatever else the task asks for. None of it needs a reference.
+
+**Any platform**
+
+- Every value comes from a token: one scale each for space, radius, type, colour, elevation and motion. Colours are named for their role (`label`, `bg`, `accent`, `separator`), so light, dark and high contrast are the same components with different values.
+- It follows the system: light and dark, larger text, reduced motion (keep fades, drop travel and bounce), reduced transparency (solid surfaces), increased contrast (firmer text and edges).
+- Every control has all its states, a hit area of at least 44 pt, a visible keyboard focus ring and an accessible name.
+- One accent colour, one primary action per view, text at 4.5:1 or better.
+
+**Web**
+
+- `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`, and never disable zoom. `color-scheme: light dark` with colours written as `light-dark(…)`.
+- Tap highlight off and your own `:active` state; `touch-action: manipulation` on controls; form fields at 16 px or more.
+- `dvh` / `svh` instead of `vh`; `env(safe-area-inset-*)` on edge-pinned bars; `overscroll-behavior: contain` on panels.
+- Hover styles inside `@media (hover: hover) and (pointer: fine)`; `:focus-visible` for the focus ring.
+- `prefers-reduced-motion`, `prefers-reduced-transparency` and `prefers-contrast` each handled.
+- Real elements before any `div` with a handler: `<button>`, `<a>`, `<dialog>`, `<details>`, `<input type="range">`.
+- Continuous corners with `corner-shape` inside `@supports`; `text-wrap: balance` on headings; `tabular-nums` on figures that change.
+
+**Apple native:** standard components first; text styles, not fixed sizes; semantic colours; `.continuous` corners; springs; `sensoryFeedback` from the standard vocabulary.
+
+**Anywhere else:** the host platform's own controls, type and conventions, with the same floor applied.
 
 ## Decisions you will make constantly
 
@@ -106,12 +150,12 @@ Starting points with a provenance. Tune by feel, then keep them as tokens.
 
 ## What ships with this skill
 
-Use these instead of re-deriving them. Paths are relative to this file.
+Use these instead of re-deriving them. Paths are relative to this file. Open one when you are about to copy from it, not to learn the rules.
 
 | File | Use it for |
 | --- | --- |
 | `assets/tokens.css` | Design tokens: space, radius, type, semantic colour (light, dark, high contrast), depth, materials, motion. Adapt names to the project's system; keep the structure. |
-| `assets/base.css` | The foundation every web UI needs plus reference primitives (button, switch, segmented control, grouped list, field, skeleton). Read it for the decisions; each has its reason beside it. |
+| `assets/base.css` | The web floor as working CSS, plus reference primitives to copy: button, switch, segmented control, grouped list, field, skeleton. |
 | `assets/physics.js` | Zero-dependency ES module: exact spring solver, `animate()` (interruptible, velocity-preserving), `draggable()` (the whole two-phase gesture), rubber-banding, momentum projection, velocity tracking, intent projection, adaptive thresholds, display filtering, organic jiggle, spring → CSS `linear()`. |
 | `assets/squircle.js` | Continuous-corner and superellipse SVG paths, concentric radius, a resize-aware clip helper. |
 | `assets/feedback.js` | One feedback vocabulary (selection / impact / notification) across vibration, synthesised sound and gamepad rumble. |
@@ -120,6 +164,30 @@ Use these instead of re-deriving them. Paths are relative to this file.
 | `scripts/audit.mjs` | `node scripts/audit.mjs <dir>` scans a codebase for the tells below and reports `file:line` with the reason and the fix. Run it in step 8 and at the start of any review. |
 
 When the project already has a motion library, a token system or a component kit, map these onto it. Copy the code in only when there is nothing to map onto.
+
+Enough to call the JavaScript without opening it:
+
+```js
+// physics.js
+springFromBounce(duration, bounce)                  // → spring. Presets: SPRINGS.micro | swift | smooth | snappy | bouncy | release
+animate({ from, to, velocity, spring, onUpdate })   // → { value, velocity, retarget(to), stop() }, interruptible
+draggable(el, { axis, bounds, snap, initial, onUpdate, onRelease, onSettle })
+                                                    // → { value, animateTo(v, { spring }), set(v), destroy() }, the whole gesture
+rubberbandClamp(value, min, max, dimension)         // resistance past an edge
+project(velocity)                                   // how far momentum carries; nearest(points, value) picks the stop
+projectedProgress(distance, velocity, track)        // commit on intent, for sliders and swipes
+new VelocityTracker()                               // .add(value, timeMs), .velocity(timeMs)
+springToCSS(spring)                                 // → { easing, durationMs } for a CSS transition
+jiggle(el, { size })                                // organic idle motion; displayFilter({ maxChange, intervalMs, monotonic })
+
+// squircle.js
+continuousCornerPath(width, height, radius)         // SVG path data; concentricRadius(outer, gap, minimum)
+
+// feedback.js
+feedback.play('selection' | 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error')
+```
+
+Token names follow one pattern: `--sn-space-*`, `--sn-radius-*`, `--sn-text-*`, `--sn-label` (`-2`, `-3`, `-4`), `--sn-bg` (`-2`, `-3`), `--sn-fill-*`, `--sn-separator`, `--sn-accent`, `--sn-shadow-*`, `--sn-material`, `--sn-dur-*`, `--sn-ease-out`, `--sn-spring-*` with a matching `-duration`, and `--sn-motion` (1, or 0 under reduced motion: multiply distances by it).
 
 ## The tells
 
@@ -154,7 +222,7 @@ Run `scripts/audit.mjs` first, then read the UI against the eight questions. Rep
 | --- | --- | --- | --- |
 | `Sheet.tsx:42` | closes with `ease-in 400ms`, input blocked until done | slow start, and the person waits on the software | spring `duration 0.35, bounce 0`, interruptible |
 
-Full protocol, severity levels and the checklist: [review.md](references/review.md).
+That is enough for most reviews. For a formal written one with severity levels, see [review.md](references/review.md).
 
 ## Reporting back
 
