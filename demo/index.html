@@ -1804,6 +1804,7 @@ function draggable(el, o = {}) {
   let anim = null;
   let pointerId = null;
   let dragging = false;
+  let caught = false;
   let startPointer = 0;
   let startValue = 0;
   let suppressClick = false;
@@ -1832,7 +1833,8 @@ function draggable(el, o = {}) {
     if (pointerId !== null || (e.pointerType === 'mouse' && e.button !== 0)) return;
     pointerId = e.pointerId;
     // Catch it mid-flight: whatever it was doing, it stops being told what to do.
-    if (anim && !anim.done) value = anim.stop().value;
+    caught = !!anim && !anim.done;
+    if (caught) value = anim.stop().value;
     dragging = false;
     startPointer = coord(e);
     startValue = value;
@@ -1862,11 +1864,20 @@ function draggable(el, o = {}) {
   const onUp = (e) => {
     if (e.pointerId !== pointerId) return;
     pointerId = null;
-    if (!dragging) return;
+    if (!dragging) {
+      // Caught mid-flight and let go without moving: don't leave it stranded between stops.
+      if (caught) settle(0);
+      caught = false;
+      return;
+    }
     dragging = false;
+    caught = false;
     suppressClick = true;
     setTimeout(() => (suppressClick = false), 0);
-    const velocity = tracker.velocity(e.timeStamp);
+    settle(tracker.velocity(e.timeStamp));
+  };
+
+  const settle = (velocity) => {
     const projected = value + project(velocity);
     const snap = read(o.snap, null);
     const [min, max] = bounds();

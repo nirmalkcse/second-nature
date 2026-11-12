@@ -217,7 +217,13 @@ function checkDeclaration(decl, stack, file, line) {
   if ((prop === 'transform' || prop === 'scale') && /(scale(3d)?\(\s*0(\.0+)?\s*[,)]|^0(\.0+)?$)/.test(value) && (inKeyframes || /starting-style|enter|open|show|from|initial|hidden|closed/i.test(stack.map((b) => b.header).join(' ')))) {
     report('scale-zero', file, line, decl);
   }
-  if ((prop === 'height' || prop === 'min-height') && /^100vh\b/.test(value)) report('viewport-100vh', file, line, decl);
+  if (prop === 'height' || prop === 'min-height') {
+    // `height: 100vh; height: 100dvh;` is the correct fallback pattern for older browsers, so a
+    // 100vh is only reported (when its block closes) if no dvh/svh declaration replaced it.
+    const block = stack[stack.length - 1];
+    if (/^100vh\b/.test(value)) (block.vh ??= {})[prop] = { line, decl };
+    else if (/\d(dvh|svh)\b/.test(value) && block.vh) delete block.vh[prop];
+  }
   if (prop === 'outline' && /^(none|0)\b/.test(value) && !stack.some((b) => /focus-visible/.test(b.header))) {
     report('focus-removed', file, line, decl); // cleared later if the file styles :focus-visible
   }
@@ -257,7 +263,10 @@ function scanCSS(source, file, lineOffset = 0) {
     } else if (ch === ';' || ch === '}') {
       const decl = text.slice(chunkStart, i);
       if (decl.includes(':') && stack.length) checkDeclaration(decl, stack, file, lineAt(text, chunkStart + (decl.length - decl.trimStart().length)) + lineOffset);
-      if (ch === '}') stack.pop();
+      if (ch === '}') {
+        const closing = stack.pop();
+        if (closing?.vh) for (const v of Object.values(closing.vh)) report('viewport-100vh', file, v.line, v.decl);
+      }
       chunkStart = i + 1;
     }
   }
